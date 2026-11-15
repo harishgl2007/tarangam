@@ -1,0 +1,2302 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TARANGAM</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Space Grotesk', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          },
+          colors: {
+            carbon: {
+              950: '#09090B',
+              900: '#101013',
+              850: '#16161A',
+              800: '#1E1E24',
+              700: '#2A2A32'
+            },
+            signal: {
+              orange: '#FF5722',
+              amber: '#F59E0B',
+              cyan: '#00D2FF',
+              lime: '#A3E635'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+    body {
+      background-color: #09090B;
+      color: #E4E4E7;
+      font-family: 'Inter', system-ui, sans-serif;
+      overflow-x: hidden;
+      font-variant-numeric: tabular-nums;
+    }
+    /* Industrial CAD Drafting Grid — crisp millimeter & centimeter crosshairs */
+    .cad-grid {
+      background-color: #0B0B0E;
+      background-image:
+        radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 0),
+        linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+      background-size: 24px 24px, 96px 96px, 96px 96px;
+    }
+    .hw-panel {
+      background-color: #111115;
+      border: 1px solid #26262E;
+      position: relative;
+    }
+    .hw-panel-header {
+      background-color: #16161B;
+      border-bottom: 1px solid #26262E;
+    }
+    .tab-active {
+      background-color: #1C1C22;
+      border-color: #FF5722 !important;
+      color: #FAFAFA !important;
+      box-shadow: inset 3px 0 0 0 #FF5722;
+    }
+    .dim-row-active {
+      background-color: rgba(255, 87, 34, 0.14) !important;
+      box-shadow: inset 3px 0 0 0 #FF5722;
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      background: #26262E;
+      height: 4px;
+      border-radius: 0;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 12px;
+      height: 18px;
+      border-radius: 1px;
+      background: #FF5722;
+      border: 1px solid #09090B;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background: #FF7043;
+    }
+    .svg-dim-group {
+      cursor: pointer;
+      transition: opacity 0.15s ease;
+    }
+    .svg-dim-group:hover text {
+      fill: #FF5722 !important;
+    }
+    .svg-dim-highlight rect {
+      stroke: #FF5722 !important;
+      stroke-width: 2px !important;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #09090B;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #27272A;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #FF5722;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-signal-orange/30 selection:text-white">
+
+  <!-- Top Industrial Workbench Bar -->
+  <header class="sticky top-0 z-30 border-b border-[#26262E] bg-[#0C0C0F]">
+    <div class="max-w-[1640px] mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3.5">
+        <div class="w-9 h-9 bg-[#16161B] border border-[#32323C] flex items-center justify-center">
+          <svg class="w-5 h-5 text-[#FF5722]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="square" d="M12 2v20M5 6l7 4 7-4M3 11l9 4 9-4M7 16l5 2 5-2" />
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2.5">
+            <h1 class="font-display text-base sm:text-lg font-bold tracking-wider uppercase text-white">
+              TARANGAM <span class="text-[#71717A] font-mono font-normal text-xs">//</span> <span class="text-[#FF5722] font-mono text-xs sm:text-sm tracking-widest"></span>
+            </h1>
+            <span class="hidden md:inline-block px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-widest bg-[#18181D] text-[#A1A1AA] border border-[#2A2A34]">
+              தரங்கம் 
+            </span>
+          </div>
+          <p class="text-[11px] font-mono text-[#71717A]">Ur All In One Antenna Design Helper Tool | Made With 🫶 By Harish</p>
+        </div>
+      </div>
+
+      <!-- Global Unit Selector & Workbench Actions -->
+      <div class="flex items-center flex-wrap gap-2">
+        <div class="flex items-center bg-[#141418] border border-[#2C2C35] p-0.5 text-xs font-mono" role="group" aria-label="Length Unit">
+          <button type="button" data-unit="mm" class="unit-btn px-2.5 py-1 bg-[#FF5722] text-black font-bold transition">mm</button>
+          <button type="button" data-unit="cm" class="unit-btn px-2.5 py-1 text-[#A1A1AA] hover:text-white transition">cm</button>
+          <button type="button" data-unit="m" class="unit-btn px-2.5 py-1 text-[#A1A1AA] hover:text-white transition">m</button>
+          <button type="button" data-unit="in" class="unit-btn px-2.5 py-1 text-[#A1A1AA] hover:text-white transition">in</button>
+          <button type="button" data-unit="ft" class="unit-btn px-2.5 py-1 text-[#A1A1AA] hover:text-white transition">ft</button>
+        </div>
+
+        <button id="btnSaveSnapshot" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono uppercase tracking-wider bg-[#141418] hover:bg-[#1E1E24] text-[#E4E4E7] border border-[#2C2C35] transition">
+          Pin to Compare (<span id="compareCount">0</span>)
+        </button>
+
+        <button id="btnCopySpecs" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono uppercase tracking-wider bg-[#141418] hover:bg-[#1E1E24] text-[#E4E4E7] border border-[#2C2C35] transition">
+          Copy Cut-Sheet
+        </button>
+
+        <button id="btnDownloadSvg" type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono uppercase tracking-wider bg-[#FF5722] hover:bg-[#F4511E] text-black font-bold transition">
+          Export SVG
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Topology Selector Strip -->
+  <section class="border-b border-[#26262E] bg-[#0E0E12]">
+    <div class="max-w-[1640px] mx-auto px-4 sm:px-6 py-2">
+      <div class="flex items-center justify-between mb-1.5">
+        <span class="text-[10px] font-mono uppercase tracking-widest text-[#71717A]">TOPOLOGY SELECT // 01–07</span>
+        <span id="activeTopologyBadge" class="text-[11px] font-mono uppercase tracking-wider text-[#FF5722]">Balanced Linear Resonator</span>
+      </div>
+      <div id="antennaTypeBar" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-1.5">
+        <!-- Populated dynamically by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Workbench Grid -->
+  <main class="flex-1 max-w-[1640px] w-full mx-auto px-4 sm:px-6 py-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
+
+    <!-- LEFT COLUMN: Parameter Input Console (4 cols) -->
+    <aside class="lg:col-span-4 space-y-4">
+
+      <!-- Frequency & Wave Constraints Module -->
+      <div class="hw-panel">
+        <div class="hw-panel-header px-4 py-2.5 flex items-center justify-between">
+          <span class="text-xs font-mono font-bold uppercase tracking-wider text-[#F4F4F6]">CH-01 // RF CONSTRAINTS</span>
+          <span id="bandClassificationBadge" class="px-1.5 py-0.5 text-[10px] font-mono uppercase bg-[#09090B] text-[#FF5722] border border-[#2C2C35]">UHF Band</span>
+        </div>
+
+        <div class="p-4 space-y-4">
+          <!-- Quick Band Presets -->
+          <div>
+            <label class="block text-[10px] font-mono uppercase tracking-wider text-[#71717A] mb-1.5">STANDARD ALLOCATIONS</label>
+            <div id="freqPresetsContainer" class="flex flex-wrap gap-1">
+              <button type="button" data-freq="145" class="preset-chip px-2 py-1 text-[11px] font-mono bg-[#16161B] hover:bg-[#1E1E26] text-[#A1A1AA] border border-[#282830] transition">145 MHz (2m VHF)</button>
+              <button type="button" data-freq="433" class="preset-chip px-2 py-1 text-[11px] font-mono bg-[#FF5722]/15 text-[#FF5722] border border-[#FF5722] transition">433 MHz (LoRa)</button>
+              <button type="button" data-freq="866" class="preset-chip px-2 py-1 text-[11px] font-mono bg-[#16161B] hover:bg-[#1E1E26] text-[#A1A1AA] border border-[#282830] transition">866 MHz (IN ISM)</button>
+              <button type="button" data-freq="915" class="preset-chip px-2 py-1 text-[11px] font-mono bg-[#16161B] hover:bg-[#1E1E26] text-[#A1A1AA] border border-[#282830] transition">915 MHz (ISM)</button>
+              <button type="button" data-freq="1575.42" class="preset-chip px-2 py-1 text-[11px] font-mono bg-[#16161B] hover:bg-[#1E1E26] text-[#A1A1AA] border border-[#282830] transition">1575.42 MHz (GPS L1)</button>
+              <button type="button" data-freq="2450" class="preset-chip px-2 py-1 text-[11px] font-mono bg-[#16161B] hover:bg-[#1E1E26] text-[#A1A1AA] border border-[#282830] transition">2.45 GHz (ESP32/Wi-Fi)</button>
+              <button type="button" data-freq="5800" class="preset-chip px-2 py-1 text-[11px] font-mono bg-[#16161B] hover:bg-[#1E1E26] text-[#A1A1AA] border border-[#282830] transition">5.8 GHz (FPV)</button>
+            </div>
+          </div>
+
+          <!-- Center Frequency -->
+          <div class="space-y-2 pt-2 border-t border-[#22222A]">
+            <div class="flex items-center justify-between">
+              <label for="freqInput" class="text-xs font-mono text-[#D4D4D8]">CENTER FREQ [f₀]</label>
+              <div class="flex items-center gap-1">
+                <input id="freqInput" type="number" min="1" max="60000" step="0.01" value="433.0"
+                  class="w-28 px-2.5 py-1 bg-[#09090B] border border-[#2E2E38] focus:border-[#FF5722] focus:outline-none text-right font-mono text-sm text-white" />
+                <select id="freqScaleSelect" aria-label="Frequency scale" class="px-2 py-1 bg-[#16161B] border border-[#2E2E38] text-xs font-mono text-[#D4D4D8] focus:outline-none">
+                  <option value="1" selected>MHz</option>
+                  <option value="1000">GHz</option>
+                </select>
+              </div>
+            </div>
+            <input id="freqSlider" type="range" min="30" max="6000" step="0.5" value="433" class="w-full" />
+            <div class="flex justify-between text-[10px] font-mono text-[#52525B]">
+              <span>30 MHz</span>
+              <span>433 MHz</span>
+              <span>2.45 GHz</span>
+              <span>6.0 GHz</span>
+            </div>
+          </div>
+
+          <!-- Velocity Factor -->
+          <div class="space-y-2 pt-3 border-t border-[#22222A]">
+            <div class="flex items-center justify-between">
+              <label for="vfInput" class="text-xs font-mono text-[#D4D4D8]">VELOCITY FACTOR [VF]</label>
+              <input id="vfInput" type="number" min="0.50" max="1.00" step="0.005" value="0.95"
+                class="w-20 px-2 py-1 bg-[#09090B] border border-[#2E2E38] focus:border-[#FF5722] focus:outline-none text-right font-mono text-xs text-white" />
+            </div>
+            <input id="vfSlider" type="range" min="0.60" max="1.00" step="0.005" value="0.95" class="w-full" />
+            <div class="pt-1">
+              <label for="materialSelect" class="block text-[10px] font-mono uppercase text-[#71717A] mb-1">CONDUCTOR STOCK</label>
+              <select id="materialSelect" class="w-full px-2.5 py-1.5 bg-[#09090B] border border-[#2E2E38] text-xs font-mono text-[#D4D4D8] focus:outline-none">
+                <option value="0.95" selected>Bare Copper / Brass Rod (VF = 0.95)</option>
+                <option value="0.96">Aluminum Tubing 6063 (VF = 0.96)</option>
+                <option value="0.93">Insulated PVC Hookup Wire (VF = 0.93)</option>
+                <option value="0.88">Teflon / Coax Shielded Element (VF = 0.88)</option>
+                <option value="1.00">Ideal Free-Space Theoretical (VF = 1.00)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Conductor Diameter -->
+          <div class="space-y-1.5 pt-3 border-t border-[#22222A]">
+            <div class="flex items-center justify-between">
+              <label for="wireDiaInput" class="text-xs font-mono text-[#D4D4D8]">ROD / WIRE DIA [d, mm]</label>
+              <input id="wireDiaInput" type="number" min="0.1" max="50" step="0.1" value="2.0"
+                class="w-20 px-2 py-1 bg-[#09090B] border border-[#2E2E38] focus:border-[#FF5722] focus:outline-none text-right font-mono text-xs text-white" />
+            </div>
+            <input id="wireDiaSlider" type="range" min="0.2" max="20" step="0.2" value="2.0" class="w-full" />
+          </div>
+
+          <!-- Topology Specific Constraints -->
+          <div id="specificConstraintsPanel" class="space-y-3 pt-3 border-t border-[#22222A]">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Wavelength Harmonics Reference Readout -->
+      <div class="hw-panel">
+        <div class="hw-panel-header px-4 py-2 flex items-center justify-between">
+          <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-[#A1A1AA]">CH-02 // FREE-SPACE HARMONICS</span>
+          <span id="periodReadout" class="text-[11px] font-mono text-[#71717A]">T = 2.31 ns</span>
+        </div>
+        <div class="p-3 grid grid-cols-2 sm:grid-cols-4 gap-1.5 font-mono">
+          <div class="p-2 bg-[#09090B] border border-[#22222A]">
+            <div class="text-[10px] text-[#71717A]">1λ FULL</div>
+            <div id="refLambdaFull" class="text-xs font-bold text-white mt-0.5">692.4 mm</div>
+          </div>
+          <div class="p-2 bg-[#09090B] border border-[#22222A]">
+            <div class="text-[10px] text-[#71717A]">λ/2 HALF</div>
+            <div id="refLambdaHalf" class="text-xs font-bold text-[#FF5722] mt-0.5">346.2 mm</div>
+          </div>
+          <div class="p-2 bg-[#09090B] border border-[#22222A]">
+            <div class="text-[10px] text-[#71717A]">λ/4 QTR</div>
+            <div id="refLambdaQuarter" class="text-xs font-bold text-[#00D2FF] mt-0.5">173.1 mm</div>
+          </div>
+          <div class="p-2 bg-[#09090B] border border-[#22222A]">
+            <div class="text-[10px] text-[#71717A]">3λ/4 THREE-Q</div>
+            <div id="refLambdaThreeQ" class="text-xs font-bold text-[#F59E0B] mt-0.5">519.3 mm</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Synthesis Equations Log -->
+      <div class="hw-panel">
+        <div class="hw-panel-header px-4 py-2 flex items-center justify-between">
+          <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-[#A1A1AA]">CH-03 // SYNTHESIS LOG</span>
+          <span class="text-[10px] font-mono text-[#71717A]">BALANIS / ARRL</span>
+        </div>
+        <div id="formulaExplanationBox" class="p-3 text-xs font-mono text-[#A1A1AA] space-y-1.5 leading-relaxed bg-[#09090B]">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT COLUMN: CAD Blueprint Viewport & Cut-Sheet Schedule (8 cols) -->
+    <section class="lg:col-span-8 space-y-4">
+
+      <!-- Blueprint Viewport Panel -->
+      <div class="hw-panel flex flex-col">
+        <!-- Viewport Top Bar -->
+        <div class="hw-panel-header px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-2.5">
+            <span id="blueprintCodeTag" class="px-1.5 py-0.5 text-[11px] font-mono font-bold bg-[#FF5722] text-black">CAD-01</span>
+            <h2 id="blueprintTitle" class="font-display text-sm sm:text-base font-bold uppercase tracking-wide text-white">Half-Wave Dipole (λ/2) — Mechanical Drawing</h2>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <!-- View Mode Switcher -->
+            <div class="flex items-center bg-[#09090B] border border-[#2C2C35] p-0.5 text-xs font-mono">
+              <button type="button" data-view="blueprint" class="view-mode-btn px-2.5 py-1 bg-[#26262E] text-white font-semibold transition">2D Blueprint</button>
+              <button type="button" data-view="radiation" class="view-mode-btn px-2.5 py-1 text-[#71717A] hover:text-white transition">Radiation &amp; SWR</button>
+            </div>
+
+            <!-- Zoom Controls -->
+            <div class="flex items-center bg-[#09090B] border border-[#2C2C35] p-0.5 text-xs font-mono">
+              <button id="btnZoomOut" type="button" title="Zoom Out" class="px-2 py-1 text-[#A1A1AA] hover:text-white transition">−</button>
+              <span id="zoomLabel" class="px-1.5 text-[11px] text-[#71717A]">100%</span>
+              <button id="btnZoomIn" type="button" title="Zoom In" class="px-2 py-1 text-[#A1A1AA] hover:text-white transition">+</button>
+              <button id="btnZoomReset" type="button" title="Reset View" class="px-2 py-1 text-[11px] text-[#71717A] hover:text-white border-l border-[#26262E] transition">Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active Dimension Readout Bar -->
+        <div id="activeDimensionBanner" class="px-4 py-2 bg-[#0D0D11] border-b border-[#26262E] flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+          <div class="flex items-center gap-2.5">
+            <span id="inspectorSymbol" class="px-1.5 py-0.5 bg-[#1E1E26] text-[#FF5722] border border-[#32323E] font-bold">ALL</span>
+            <span id="inspectorTitle" class="text-[#A1A1AA] font-sans text-xs">Hover or click any dimension callout on the drawing or schedule below to isolate that part.</span>
+          </div>
+          <span id="inspectorValueBadge" class="font-mono font-bold text-[#FF5722]"></span>
+        </div>
+
+        <!-- Main Interactive SVG Viewport -->
+        <div id="blueprintViewportContainer" class="relative cad-grid min-h-[400px] sm:min-h-[440px] flex items-center justify-center overflow-hidden select-none">
+          <svg id="antennaSvgCanvas" viewBox="0 0 900 440" class="w-full h-full max-h-[450px] transition-transform duration-150" xmlns="http://www.w3.org/2000/svg">
+            <!-- Dynamically rendered by JS -->
+          </svg>
+        </div>
+
+        <!-- Secondary View: Polar Plot & VSWR Response -->
+        <div id="radiationViewportContainer" class="hidden cad-grid min-h-[400px] sm:min-h-[440px] p-4 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+          <div class="bg-[#0B0B0E] border border-[#26262E] p-4 flex flex-col items-center">
+            <div class="w-full flex items-center justify-between mb-2 font-mono text-xs">
+              <span class="text-[#E4E4E7] uppercase">FAR-FIELD RADIATION (E/H PLANE)</span>
+              <span class="text-[#FF5722]">NORMALIZED dB</span>
+            </div>
+            <div class="relative w-64 h-64 sm:w-72 sm:h-72">
+              <canvas id="polarPatternCanvas" width="300" height="300" class="w-full h-full"></canvas>
+            </div>
+            <div class="flex items-center gap-5 mt-2 text-[11px] font-mono">
+              <span class="flex items-center gap-1.5 text-[#FF5722]"><span class="w-3 h-0.5 bg-[#FF5722] inline-block"></span>E-PLANE</span>
+              <span class="flex items-center gap-1.5 text-[#00D2FF]"><span class="w-3 h-0.5 bg-[#00D2FF] inline-block"></span>H-PLANE</span>
+            </div>
+          </div>
+
+          <div class="bg-[#0B0B0E] border border-[#26262E] p-4 flex flex-col justify-between h-full space-y-3">
+            <div class="flex items-center justify-between font-mono text-xs">
+              <span class="text-[#E4E4E7] uppercase">VSWR SWEEP @ <span id="vswrCenterFreqLabel" class="text-[#FF5722]">433.0 MHz</span></span>
+              <span id="bandwidthBadge" class="px-1.5 py-0.5 bg-[#16161B] text-[#00D2FF] border border-[#2C2C35] text-[11px]">BW (2:1) ≈ 34.6 MHz</span>
+            </div>
+            <div class="relative h-56 w-full">
+              <canvas id="vswrChartCanvas" width="420" height="230" class="w-full h-full"></canvas>
+            </div>
+            <p class="text-[11px] font-mono text-[#71717A] leading-relaxed">
+              NOTE: Trimming physical radiator length shorter shifts f₀ resonance higher; lengthening shifts f₀ lower.
+            </p>
+          </div>
+        </div>
+
+        <!-- Telemetry Strip -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 border-t border-[#26262E] bg-[#0E0E12] divide-y sm:divide-y-0 sm:divide-x divide-[#26262E] font-mono">
+          <div class="p-3">
+            <div class="text-[10px] uppercase text-[#71717A]">DIRECTIVITY / GAIN</div>
+            <div id="kpiGain" class="text-sm sm:text-base font-bold text-white mt-0.5">2.15 dBi</div>
+          </div>
+          <div class="p-3">
+            <div class="text-[10px] uppercase text-[#71717A]">FEEDPOINT Z_IN</div>
+            <div id="kpiImpedance" class="text-sm sm:text-base font-bold text-[#FF5722] mt-0.5">73.1 Ω (Balanced)</div>
+          </div>
+          <div class="p-3">
+            <div class="text-[10px] uppercase text-[#71717A]">-3 dB BEAMWIDTH</div>
+            <div id="kpiBeamwidth" class="text-sm sm:text-base font-bold text-[#00D2FF] mt-0.5">78.0° E-Plane</div>
+          </div>
+          <div class="p-3">
+            <div class="text-[10px] uppercase text-[#71717A]">POLARIZATION / MODE</div>
+            <div id="kpiPolarization" class="text-sm sm:text-base font-bold text-[#E4E4E7] mt-0.5">Linear / Omni Donut</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mechanical Cut-Sheet Schedule Table -->
+      <div class="hw-panel">
+        <div class="hw-panel-header px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-mono font-bold uppercase tracking-wider text-[#F4F4F6]">SCHEDULE // PHYSICAL DIMENSIONS &amp; FABRICATION KEY</span>
+            <span class="text-[11px] font-mono text-[#71717A] hidden sm:inline">[CLICK ROW TO LOCK CALLOUT ON DRAWING]</span>
+          </div>
+          <button id="btnClearHighlight" type="button" class="hidden px-2.5 py-1 text-[11px] font-mono uppercase bg-[#FF5722] text-black font-bold transition">
+            Unlock Highlight
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-[#0B0B0E] text-[10px] font-mono uppercase tracking-wider text-[#71717A] border-b border-[#26262E]">
+                <th class="py-2.5 px-3">REF</th>
+                <th class="py-2.5 px-3">ELEMENT / DIMENSION</th>
+                <th class="py-2.5 px-3 text-right">CUT VALUE [<span id="tableUnitHeader">mm</span>]</th>
+                <th class="py-2.5 px-3 text-right hidden sm:table-cell">WAVELENGTH</th>
+                <th class="py-2.5 px-3">PHYSICAL MEANING &amp; MACHINING NOTES</th>
+              </tr>
+            </thead>
+            <tbody id="measurementsTableBody" class="divide-y divide-[#1E1E26] text-xs">
+              <!-- Populated dynamically by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Pinned Comparison Tray -->
+      <div id="comparisonSection" class="hidden hw-panel p-4 space-y-3">
+        <div class="flex items-center justify-between border-b border-[#26262E] pb-2">
+          <div>
+            <h3 class="text-xs font-mono font-bold uppercase tracking-wider text-white">COMPARISON BENCH // PINNED CONFIGURATIONS</h3>
+          </div>
+          <button id="btnClearCompare" type="button" class="text-xs font-mono uppercase text-[#FF5722] hover:underline px-2 py-0.5">
+            Clear All
+          </button>
+        </div>
+        <div id="comparisonCardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Toast Notification -->
+  <div id="toastNotification" class="fixed bottom-5 right-5 z-50 hidden items-center gap-2.5 px-4 py-2.5 bg-[#141418] border border-[#FF5722] text-xs font-mono text-white shadow-2xl">
+    <span class="w-2 h-2 bg-[#FF5722]"></span>
+    <span id="toastMessage">COPIED CUT-SHEET TO CLIPBOARD</span>
+  </div>
+
+  <script>
+    // =========================================================================
+    // TARANGAM // KADIR-YANTRA — Industrial RF Antenna Synthesis Engine
+    // =========================================================================
+
+    const SPEED_OF_LIGHT = 299792458; // m/s in vacuum
+
+    const ANTENNA_TYPES = [
+      {
+        id: 'dipole',
+        code: 'CAD-01',
+        name: 'Half-Wave Dipole',
+        shortSub: 'λ/2 Center-Fed',
+        badge: 'Balanced Linear Resonator'
+      },
+      {
+        id: 'monopole',
+        code: 'CAD-02',
+        name: 'Quarter-Wave GP',
+        shortSub: 'λ/4 Ground Plane',
+        badge: 'Unbalanced Omni Vertical'
+      },
+      {
+        id: 'yagi',
+        code: 'CAD-03',
+        name: 'Yagi-Uda Beam',
+        shortSub: '3–10 Element Array',
+        badge: 'High-Gain Directional Array'
+      },
+      {
+        id: 'patch',
+        code: 'CAD-04',
+        name: 'Microstrip Patch',
+        shortSub: 'PCB Inset-Fed',
+        badge: 'Planar PCB Resonator'
+      },
+      {
+        id: 'helix',
+        code: 'CAD-05',
+        name: 'Axial Helical',
+        shortSub: 'Circular Polarized',
+        badge: 'End-Fire Circular Wave'
+      },
+      {
+        id: 'jpole',
+        code: 'CAD-06',
+        name: 'J-Pole End-Fed',
+        shortSub: '3λ/4 + λ/4 Stub',
+        badge: 'Stub-Matched Omni Vertical'
+      },
+      {
+        id: 'ifa',
+        code: 'CAD-07',
+        name: 'Inverted-F (IFA)',
+        shortSub: 'Compact PCB/IoT',
+        badge: 'Low-Profile Shunt-Fed Monopole'
+      }
+    ];
+
+    const state = {
+      antennaType: 'dipole',
+      freqMHz: 433.0,
+      freqScale: 1,
+      vf: 0.95,
+      wireDiaMm: 2.0,
+      unit: 'mm',
+      viewMode: 'blueprint',
+      zoom: 1.0,
+      highlightedId: null,
+      lockedHighlightId: null,
+      yagiElements: 5,
+      yagiDirectorSpacingLambda: 0.22,
+      yagiBoomDiaMm: 16.0,
+      patchEr: 4.4,
+      patchHeightMm: 1.6,
+      helixTurns: 6,
+      helixPitchDeg: 12.5,
+      monopoleRadialAngleDeg: 45,
+      jpoleSpacingFactor: 0.025,
+      ifaHeightFactor: 0.04,
+      pinnedComparisons: []
+    };
+
+    const UNIT_CONVERTERS = {
+      mm: { factor: 1, decimals: 1, label: 'mm' },
+      cm: { factor: 0.1, decimals: 2, label: 'cm' },
+      m: { factor: 0.001, decimals: 4, label: 'm' },
+      in: { factor: 1 / 25.4, decimals: 2, label: 'in' },
+      ft: { factor: 1 / 304.8, decimals: 3, label: 'ft' }
+    };
+
+    function formatLen(mmValue, includeUnit = true) {
+      const cfg = UNIT_CONVERTERS[state.unit] || UNIT_CONVERTERS.mm;
+      const converted = mmValue * cfg.factor;
+      let decimals = cfg.decimals;
+      if (Math.abs(converted) >= 1000 && decimals > 1) decimals = 1;
+      if (Math.abs(converted) < 1 && decimals < 3) decimals = 3;
+      const str = converted.toFixed(decimals);
+      return includeUnit ? `${str} ${cfg.label}` : str;
+    }
+
+    function getBandClassification(freqMHz) {
+      if (freqMHz < 30) return 'HF // 3–30 MHz';
+      if (freqMHz < 300) return 'VHF // 30–300 MHz';
+      if (freqMHz < 3000) return 'UHF // 300–3000 MHz';
+      if (freqMHz < 30000) return 'SHF // 3–30 GHz';
+      return 'EHF // MM-WAVE';
+    }
+
+    // =========================================================================
+    // Core RF Calculation Engine
+    // =========================================================================
+    function computeAntennaModel() {
+      const fMHz = Math.max(1, state.freqMHz);
+      const fHz = fMHz * 1e6;
+      const lambdaMm = (SPEED_OF_LIGHT / fHz) * 1000;
+      const vf = state.vf;
+      const d = state.wireDiaMm;
+
+      const ratioLD = Math.max(10, (0.5 * lambdaMm) / Math.max(0.1, d));
+      const kEndEffect = Math.min(0.98, Math.max(0.91, 1 - (0.045 / Math.log10(ratioLD))));
+      const effectiveK = Math.min(vf, vf * (0.985 + 0.015 * kEndEffect));
+
+      let model = {
+        type: state.antennaType,
+        freqMHz: fMHz,
+        lambdaMm,
+        dimensions: [],
+        kpis: {},
+        formulasHtml: '',
+        vswrBwPercent: 8.0
+      };
+
+      if (state.antennaType === 'dipole') {
+        const feedGap = Math.max(1.5, Math.min(15, lambdaMm * 0.008));
+        const totalL = 0.5 * lambdaMm * effectiveK;
+        const singleArm = (totalL - feedGap) / 2;
+
+        model.dimensions = [
+          {
+            id: 'L_total',
+            symbol: 'L',
+            name: 'Total Dipole Span',
+            mm: totalL,
+            elec: `${(0.5 * effectiveK).toFixed(3)} λ`,
+            color: '#FF5722',
+            desc: 'Overall tip-to-tip resonant length across both radiator arms plus center insulator gap.'
+          },
+          {
+            id: 'L_arm',
+            symbol: 'L₁, L₂',
+            name: 'Single Quarter-Wave Arm (×2)',
+            mm: singleArm,
+            elec: `${(singleArm / lambdaMm).toFixed(3)} λ`,
+            color: '#00D2FF',
+            desc: 'Cut two identical conductive rods/wires to this exact length for the balanced feed terminals.'
+          },
+          {
+            id: 'g_feed',
+            symbol: 'g',
+            name: 'Center Feed Insulator Gap',
+            mm: feedGap,
+            elec: '0.008 λ',
+            color: '#F59E0B',
+            desc: 'Center air/dielectric spacing between inner feed terminals where 50/75 Ω coax or 1:1 balun attaches.'
+          },
+          {
+            id: 'd_wire',
+            symbol: 'd',
+            name: 'Conductor Stock Diameter',
+            mm: d,
+            elec: `${(d / lambdaMm).toFixed(4)} λ`,
+            color: '#E4E4E7',
+            desc: 'Rod or wire thickness. Increasing conductor diameter lowers Q and widens usable VSWR bandwidth.'
+          }
+        ];
+
+        model.kpis = {
+          gain: '2.15 dBi',
+          impedance: '73.1 Ω (Balanced)',
+          beamwidth: '78.0° E-Plane',
+          polarization: 'Linear Horizontal/Vert'
+        };
+        model.vswrBwPercent = Math.min(16, Math.max(4, 6.5 + Math.log10(d + 1) * 4));
+        model.formulasHtml = `
+          <div>λ₀ = c / f₀ = 299,792.458 / ${fMHz.toFixed(2)} = <span class="text-white">${formatLen(lambdaMm)}</span></div>
+          <div>L  = 0.5 · λ₀ · k_eff = 0.5 × ${formatLen(lambdaMm, false)} × ${effectiveK.toFixed(3)} = <span class="text-[#FF5722]">${formatLen(totalL)}</span></div>
+          <div>L₁ = (L − g) / 2 = <span class="text-[#00D2FF]">${formatLen(singleArm)}</span> per arm</div>
+        `;
+      } else if (state.antennaType === 'monopole') {
+        const angleDeg = state.monopoleRadialAngleDeg;
+        const angleRad = (angleDeg * Math.PI) / 180;
+        const vertL = 0.25 * lambdaMm * effectiveK;
+        const radialL = vertL * 1.05;
+        const footprintDia = 2 * radialL * Math.cos(angleRad);
+        const verticalDrop = radialL * Math.sin(angleRad);
+        const feedZ = Math.round(36 + (angleDeg / 45) * 14);
+
+        model.dimensions = [
+          {
+            id: 'L_vert',
+            symbol: 'L_v',
+            name: 'Vertical Whip Radiator',
+            mm: vertL,
+            elec: `${(vertL / lambdaMm).toFixed(3)} λ`,
+            color: '#FF5722',
+            desc: 'Quarter-wave vertical element soldered directly to the center pin of the SMA / N / SO-239 chassis mount.'
+          },
+          {
+            id: 'L_rad',
+            symbol: 'L_r',
+            name: 'Ground Plane Radials (×4)',
+            mm: radialL,
+            elec: `${(radialL / lambdaMm).toFixed(3)} λ`,
+            color: '#00D2FF',
+            desc: 'Four counterpoise rods bolted to the connector flange ground, cut 5% longer than the vertical whip.'
+          },
+          {
+            id: 'D_span',
+            symbol: 'D_base',
+            name: 'Horizontal Footprint Span',
+            mm: footprintDia,
+            elec: `${(footprintDia / lambdaMm).toFixed(3)} λ`,
+            color: '#F59E0B',
+            desc: `Tip-to-tip horizontal clearance diameter when radials are angled downward at θ = ${angleDeg}°.`
+          },
+          {
+            id: 'H_skirt',
+            symbol: 'H_drop',
+            name: 'Radial Cone Vertical Drop',
+            mm: verticalDrop,
+            elec: `${(verticalDrop / lambdaMm).toFixed(3)} λ`,
+            color: '#E4E4E7',
+            desc: `Vertical projection of the drooping radial skirt below the coax flange (${angleDeg}° yields ~${feedZ} Ω).`
+          }
+        ];
+
+        model.kpis = {
+          gain: '5.15 dBi (Hemisphere)',
+          impedance: `${feedZ}.0 Ω (Unbalanced)`,
+          beamwidth: '47.0° Elevation',
+          polarization: 'Vertical Omnidirectional'
+        };
+        model.vswrBwPercent = 10.5;
+        model.formulasHtml = `
+          <div>L_v = 0.25 · λ₀ · k_eff = <span class="text-[#FF5722]">${formatLen(vertL)}</span></div>
+          <div>L_r = 1.05 · L_v = <span class="text-[#00D2FF]">${formatLen(radialL)}</span> (×4 radials @ θ = ${angleDeg}°)</div>
+          <div>Z_in ≈ 36 Ω + 14 Ω · (θ / 45°) = <span class="text-white">${feedZ} Ω</span></div>
+        `;
+      } else if (state.antennaType === 'yagi') {
+        const nElem = Math.max(3, Math.min(10, Math.round(state.yagiElements)));
+        const dirSpacingFrac = state.yagiDirectorSpacingLambda;
+        const lRef = 0.495 * lambdaMm * vf;
+        const lDe = 0.473 * lambdaMm * vf;
+        const sRefDe = 0.20 * lambdaMm;
+        const sDir = dirSpacingFrac * lambdaMm;
+
+        const dirLengths = [];
+        for (let i = 0; i < nElem - 2; i++) {
+          const taperFactor = Math.max(0.405, 0.440 - i * 0.0065);
+          dirLengths.push(taperFactor * lambdaMm * vf);
+        }
+
+        const totalBoom = sRefDe + (nElem - 2) * sDir + 0.06 * lambdaMm;
+        const estGain = (7.1 + Math.log2(nElem - 1) * 2.45).toFixed(2);
+        const estFB = Math.min(26, 14 + (nElem - 3) * 1.8).toFixed(1);
+        const estBW = Math.max(28, 66 - (nElem - 3) * 5.2).toFixed(1);
+
+        model.dimensions = [
+          {
+            id: 'L_ref',
+            symbol: 'L_Ref',
+            name: 'Reflector Element (Rear)',
+            mm: lRef,
+            elec: `${(0.495 * vf).toFixed(3)} λ`,
+            color: '#F59E0B',
+            desc: 'Inductive parasitic element mounted at the rear of the boom; reflects back-lobe energy forward.'
+          },
+          {
+            id: 'L_de',
+            symbol: 'L_DE',
+            name: 'Driven Element (Feedpoint)',
+            mm: lDe,
+            elec: `${(0.473 * vf).toFixed(3)} λ`,
+            color: '#FF5722',
+            desc: 'Fed dipole or folded-dipole element driven by the transmission line via gamma match or balun.'
+          },
+          {
+            id: 'L_d1',
+            symbol: 'L_D1',
+            name: 'First Director (D1)',
+            mm: dirLengths[0],
+            elec: `${(dirLengths[0] / lambdaMm).toFixed(3)} λ`,
+            color: '#00D2FF',
+            desc: 'First capacitive parasitic director forward of the driven element; controls forward gain and feed impedance.'
+          }
+        ];
+
+        if (dirLengths.length > 1) {
+          model.dimensions.push({
+            id: 'L_dn',
+            symbol: `L_D${dirLengths.length}`,
+            name: `Tip Director (D${dirLengths.length})`,
+            mm: dirLengths[dirLengths.length - 1],
+            elec: `${(dirLengths[dirLengths.length - 1] / lambdaMm).toFixed(3)} λ`,
+            color: '#00D2FF',
+            desc: `Front-most director element (tapered progressively across ${dirLengths.length} directors).`
+          });
+        }
+
+        model.dimensions.push(
+          {
+            id: 'S_ref',
+            symbol: 'S_Ref',
+            name: 'Reflector-to-Driven Spacing',
+            mm: sRefDe,
+            elec: '0.200 λ',
+            color: '#E4E4E7',
+            desc: 'Center-to-center boom spacing between the Reflector and Driven Element.'
+          },
+          {
+            id: 'S_dir',
+            symbol: 'S_Dir',
+            name: 'Director-to-Director Pitch',
+            mm: sDir,
+            elec: `${dirSpacingFrac.toFixed(3)} λ`,
+            color: '#A3E635',
+            desc: 'Center-to-center boom spacing between consecutive Director elements.'
+          },
+          {
+            id: 'B_total',
+            symbol: 'B',
+            name: `Total Boom Length (${nElem} Elem)`,
+            mm: totalBoom,
+            elec: `${(totalBoom / lambdaMm).toFixed(2)} λ`,
+            color: '#FF5722',
+            desc: 'Overall support boom length including 0.03λ mechanical clamping overhang at each end.'
+          }
+        );
+
+        model.yagiMeta = { nElem, dirLengths, sRefDe, sDir, lRef, lDe, totalBoom };
+        model.kpis = {
+          gain: `${estGain} dBi (Forward)`,
+          impedance: '50.0 Ω (Matched)',
+          beamwidth: `${estBW}° Azimuth`,
+          polarization: `F/B Ratio: ${estFB} dB`
+        };
+        model.vswrBwPercent = 5.5;
+        model.formulasHtml = `
+          <div>L_Ref = ${formatLen(lRef)} | L_DE = <span class="text-[#FF5722]">${formatLen(lDe)}</span></div>
+          <div>D1..D${dirLengths.length} = ${dirLengths.map((x, idx) => `D${idx + 1}:${formatLen(x, false)}`).join(' / ')} [${state.unit}]</div>
+          <div>Boom B = S_Ref + ${(nElem - 2)}·S_Dir + Margin = <span class="text-[#00D2FF]">${formatLen(totalBoom)}</span></div>
+        `;
+      } else if (state.antennaType === 'patch') {
+        const er = Math.max(1.1, state.patchEr);
+        const h = Math.max(0.1, state.patchHeightMm);
+        const patchW = (lambdaMm / 2) * Math.sqrt(2 / (er + 1));
+        const whRatio = patchW / h;
+        const ereff = ((er + 1) / 2) + ((er - 1) / 2) * Math.pow(1 + 12 / whRatio, -0.5);
+        const deltaL = 0.412 * h * ((ereff + 0.3) * (whRatio + 0.264)) / ((ereff - 0.258) * (whRatio + 0.8));
+        const leff = lambdaMm / (2 * Math.sqrt(ereff));
+        const patchL = Math.max(1.0, leff - 2 * deltaL);
+        const y0 = patchL * 0.315;
+        const traceW50 = h * 1.91;
+        const gndW = patchW + 6 * h;
+        const gndL = patchL + 6 * h;
+
+        model.dimensions = [
+          {
+            id: 'W_patch',
+            symbol: 'W',
+            name: 'Copper Patch Width',
+            mm: patchW,
+            elec: `${(patchW / lambdaMm).toFixed(3)} λ₀`,
+            color: '#FF5722',
+            desc: 'Transverse width of the top etched copper patch; governs radiation efficiency and edge resistance.'
+          },
+          {
+            id: 'L_patch',
+            symbol: 'L',
+            name: 'Copper Patch Resonant Length',
+            mm: patchL,
+            elec: '0.500 λ_g − 2ΔL',
+            color: '#00D2FF',
+            desc: `Physical copper length between radiating slot edges (shortened by 2ΔL = ${formatLen(2 * deltaL)} for fringing).`
+          },
+          {
+            id: 'y0_inset',
+            symbol: 'y₀',
+            name: '50 Ω Inset Feed Notch Depth',
+            mm: y0,
+            elec: `${((y0 / patchL) * 100).toFixed(1)}% of L`,
+            color: '#F59E0B',
+            desc: 'Recessed notch cut into the patch edge so the microstrip feedline matches 50 Ω directly.'
+          },
+          {
+            id: 'W_feed',
+            symbol: 'W_f',
+            name: '50 Ω Microstrip Feedline Width',
+            mm: traceW50,
+            elec: 'Z₀ = 50 Ω',
+            color: '#A3E635',
+            desc: `Copper trace width for 50 Ω characteristic impedance on h = ${h} mm, εr = ${er} laminate.`
+          },
+          {
+            id: 'Gnd_dim',
+            symbol: 'W_g × L_g',
+            name: 'Minimum Ground Plane Size',
+            mm: gndW,
+            elec: `${formatLen(gndW, false)} × ${formatLen(gndL)}`,
+            color: '#E4E4E7',
+            desc: 'Minimum bottom copper ground plane & substrate outline (extends ≥ 3h beyond patch edges).'
+          }
+        ];
+
+        model.patchMeta = { er, ereff, deltaL, h, patchW, patchL, gndW, gndL, y0, traceW50 };
+        model.kpis = {
+          gain: '6.80 dBi (Boresight)',
+          impedance: '50.0 Ω (Inset Match)',
+          beamwidth: '72.0° Half-Power',
+          polarization: `ε_reff = ${ereff.toFixed(2)}`
+        };
+        model.vswrBwPercent = 3.2;
+        model.formulasHtml = `
+          <div>W = (c / 2f₀)·√[2/(ε_r+1)] = <span class="text-[#FF5722]">${formatLen(patchW)}</span> (ε_r=${er}, h=${h}mm)</div>
+          <div>ε_reff = ${ereff.toFixed(3)} | ΔL = ${formatLen(deltaL)} fringing extension</div>
+          <div>L = L_eff − 2ΔL = <span class="text-[#00D2FF]">${formatLen(patchL)}</span> | y₀ = <span class="text-white">${formatLen(y0)}</span></div>
+        `;
+      } else if (state.antennaType === 'helix') {
+        const turns = Math.max(3, Math.min(20, Math.round(state.helixTurns)));
+        const pitchDeg = state.helixPitchDeg;
+        const pitchRad = (pitchDeg * Math.PI) / 180;
+        const circumference = lambdaMm * 1.0;
+        const diameter = circumference / Math.PI;
+        const turnSpacing = circumference * Math.tan(pitchRad);
+        const turnWireLen = Math.sqrt(circumference * circumference + turnSpacing * turnSpacing);
+        const totalAxialLen = turns * turnSpacing;
+        const totalWireLen = turns * turnWireLen;
+        const reflectorDia = 0.85 * lambdaMm;
+        const krausGainDb = (10.8 + 10 * Math.log10((turns * turnSpacing) / lambdaMm)).toFixed(2);
+        const hpbwDeg = (52 / Math.sqrt((turns * turnSpacing) / lambdaMm)).toFixed(1);
+
+        model.dimensions = [
+          {
+            id: 'D_helix',
+            symbol: 'D',
+            name: 'Helix Coil Mandrel Diameter',
+            mm: diameter,
+            elec: '0.318 λ',
+            color: '#FF5722',
+            desc: 'Center-to-center diameter of the cylindrical winding form (circumference C = πD = 1.0 λ).'
+          },
+          {
+            id: 'S_turn',
+            symbol: 'S',
+            name: 'Turn-to-Turn Axial Pitch',
+            mm: turnSpacing,
+            elec: `${(turnSpacing / lambdaMm).toFixed(3)} λ`,
+            color: '#00D2FF',
+            desc: `Axial spacing between adjacent turns for pitch angle α = ${pitchDeg}°.`
+          },
+          {
+            id: 'A_axial',
+            symbol: 'A',
+            name: `Total Axial Length (${turns} Turns)`,
+            mm: totalAxialLen,
+            elec: `${(totalAxialLen / lambdaMm).toFixed(2)} λ`,
+            color: '#F59E0B',
+            desc: 'Total axial length of the wound helix from the ground reflector plate to the open front end.'
+          },
+          {
+            id: 'L_wire_tot',
+            symbol: 'L_wire',
+            name: 'Total Unwound Conductor Stock',
+            mm: totalWireLen,
+            elec: `${turns} × ${formatLen(turnWireLen)}`,
+            color: '#A3E635',
+            desc: 'Total straight length of copper wire/tubing needed prior to winding.'
+          },
+          {
+            id: 'D_gnd',
+            symbol: 'D_ref',
+            name: 'Ground Reflector Disc Diameter',
+            mm: reflectorDia,
+            elec: '0.850 λ',
+            color: '#E4E4E7',
+            desc: 'Circular or square metal reflector plate (≥ 0.75λ) mounted behind the feedpoint.'
+          }
+        ];
+
+        model.helixMeta = { turns, pitchDeg, diameter, turnSpacing, totalAxialLen, reflectorDia };
+        model.kpis = {
+          gain: `${krausGainDb} dBi (Axial)`,
+          impedance: '140 Ω → 50 Ω λ/4 Strip',
+          beamwidth: `${hpbwDeg}° Conical`,
+          polarization: 'Circular (RHCP/LHCP)'
+        };
+        model.vswrBwPercent = 28.0;
+        model.formulasHtml = `
+          <div>C = 1.0·λ₀ = ${formatLen(circumference)} → D = C/π = <span class="text-[#FF5722]">${formatLen(diameter)}</span></div>
+          <div>S = C·tan(${pitchDeg}°) = <span class="text-[#00D2FF]">${formatLen(turnSpacing)}</span> | A = N·S = <span class="text-white">${formatLen(totalAxialLen)}</span></div>
+          <div>L_wire = ${turns}·√(C² + S²) = <span class="text-[#A3E635]">${formatLen(totalWireLen)}</span></div>
+        `;
+      } else if (state.antennaType === 'jpole') {
+        const longLeg = 0.75 * lambdaMm * vf;
+        const shortStub = 0.25 * lambdaMm * vf;
+        const radiatorSection = longLeg - shortStub;
+        const stubSpacing = state.jpoleSpacingFactor * lambdaMm;
+        const feedTap = 0.032 * lambdaMm * vf;
+
+        model.dimensions = [
+          {
+            id: 'L_long',
+            symbol: 'L_A',
+            name: 'Total Long Element (3λ/4)',
+            mm: longLeg,
+            elec: `${(0.75 * vf).toFixed(3)} λ`,
+            color: '#FF5722',
+            desc: 'Main vertical tube combining the upper λ/2 radiator section and lower λ/4 matching stub.'
+          },
+          {
+            id: 'L_stub',
+            symbol: 'L_B',
+            name: 'Quarter-Wave Matching Stub (λ/4)',
+            mm: shortStub,
+            elec: `${(0.25 * vf).toFixed(3)} λ`,
+            color: '#00D2FF',
+            desc: 'Parallel matching arm shorted at the bottom bar and open-circuited at its top end.'
+          },
+          {
+            id: 'L_rad_top',
+            symbol: 'L_rad',
+            name: 'Upper Half-Wave Radiator Section',
+            mm: radiatorSection,
+            elec: `${(0.50 * vf).toFixed(3)} λ`,
+            color: '#A3E635',
+            desc: 'Active radiating section extending above the top tip of the λ/4 matching stub.'
+          },
+          {
+            id: 'L_tap',
+            symbol: 'L_C',
+            name: '50 Ω Coax Tap Offset',
+            mm: feedTap,
+            elec: '0.032 λ',
+            color: '#F59E0B',
+            desc: 'Distance measured from the bottom shorting bar up to the 50 Ω coax attachment points.'
+          },
+          {
+            id: 'S_gap',
+            symbol: 'S',
+            name: 'Center-to-Center Tube Pitch',
+            mm: stubSpacing,
+            elec: `${state.jpoleSpacingFactor.toFixed(3)} λ`,
+            color: '#E4E4E7',
+            desc: 'Parallel center-to-center spacing between the long radiator tube and short matching stub.'
+          }
+        ];
+
+        model.kpis = {
+          gain: '2.65 dBi (Low-Angle)',
+          impedance: '50.0 Ω (Tap Matched)',
+          beamwidth: '75.0° Elevation',
+          polarization: 'Vertical Omni (DC Ground)'
+        };
+        model.vswrBwPercent = 9.0;
+        model.formulasHtml = `
+          <div>L_A (Long) = 0.75 · λ₀ · VF = <span class="text-[#FF5722]">${formatLen(longLeg)}</span></div>
+          <div>L_B (Stub) = 0.25 · λ₀ · VF = <span class="text-[#00D2FF]">${formatLen(shortStub)}</span></div>
+          <div>L_C (50Ω Tap) ≈ 0.032 · λ₀ · VF = <span class="text-white">${formatLen(feedTap)}</span></div>
+        `;
+      } else if (state.antennaType === 'ifa') {
+        const hStub = state.ifaHeightFactor * lambdaMm;
+        const armL = (0.25 * lambdaMm * vf) - hStub;
+        const feedSpacing = 0.26 * armL;
+        const traceW = Math.max(0.8, 0.008 * lambdaMm);
+
+        model.dimensions = [
+          {
+            id: 'L_ifa_arm',
+            symbol: 'L_arm',
+            name: 'Horizontal Resonant Top Arm',
+            mm: armL,
+            elec: `${(armL / lambdaMm).toFixed(3)} λ`,
+            color: '#FF5722',
+            desc: 'Horizontal copper trace running parallel to the PCB ground edge (L_arm + H_short ≈ λ/4).'
+          },
+          {
+            id: 'H_ifa_short',
+            symbol: 'H_short',
+            name: 'Shorting Stub Height to Ground',
+            mm: hStub,
+            elec: `${state.ifaHeightFactor.toFixed(3)} λ`,
+            color: '#00D2FF',
+            desc: 'Vertical stub connecting the corner of the IFA directly to the PCB ground plane via.'
+          },
+          {
+            id: 'D_ifa_feed',
+            symbol: 'D_feed',
+            name: 'Short-to-Feed Pin Pitch',
+            mm: feedSpacing,
+            elec: `${(feedSpacing / lambdaMm).toFixed(3)} λ`,
+            color: '#F59E0B',
+            desc: 'Spacing between the ground shorting leg and the 50 Ω RF feed pin; sets the 50 Ω shunt match.'
+          },
+          {
+            id: 'W_ifa_trace',
+            symbol: 'W_t',
+            name: 'Conductor / Trace Width',
+            mm: traceW,
+            elec: `${(traceW / lambdaMm).toFixed(4)} λ`,
+            color: '#E4E4E7',
+            desc: 'Width of the etched copper track in the ungrounded PCB keep-out zone.'
+          }
+        ];
+
+        model.kpis = {
+          gain: '2.10 dBi (Quasi-Omni)',
+          impedance: '50.0 Ω (Shunt Matched)',
+          beamwidth: '85.0° Omni-Directional',
+          polarization: 'Mixed Linear (IoT/BLE)'
+        };
+        model.vswrBwPercent = 7.2;
+        model.formulasHtml = `
+          <div>H_short = ${state.ifaHeightFactor.toFixed(3)} · λ₀ = <span class="text-[#00D2FF]">${formatLen(hStub)}</span></div>
+          <div>L_arm = (0.25 · λ₀ · VF) − H_short = <span class="text-[#FF5722]">${formatLen(armL)}</span></div>
+          <div>D_feed (50Ω Tap) ≈ 0.26 · L_arm = <span class="text-white">${formatLen(feedSpacing)}</span></div>
+        `;
+      }
+
+      return model;
+    }
+
+    // =========================================================================
+    // Industrial CAD Blueprint SVG Renderer (ISO/ANSI Technical Drafting Style)
+    // =========================================================================
+    function createSvgDefs() {
+      return `
+        <defs>
+          <marker id="tickOrangeStart" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M 9 1 L 1 5 L 9 9 z" fill="#FF5722" />
+          </marker>
+          <marker id="tickOrangeEnd" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M 1 1 L 9 5 L 1 9 z" fill="#FF5722" />
+          </marker>
+          <marker id="tickCyanStart" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M 9 1 L 1 5 L 9 9 z" fill="#00D2FF" />
+          </marker>
+          <marker id="tickCyanEnd" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M 1 1 L 9 5 L 1 9 z" fill="#00D2FF" />
+          </marker>
+          <marker id="tickAmberStart" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M 9 1 L 1 5 L 9 9 z" fill="#F59E0B" />
+          </marker>
+          <marker id="tickAmberEnd" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M 1 1 L 9 5 L 1 9 z" fill="#F59E0B" />
+          </marker>
+          <marker id="tickWhiteStart" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M 9 1 L 1 5 L 9 9 z" fill="#E4E4E7" />
+          </marker>
+          <marker id="tickWhiteEnd" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M 1 1 L 9 5 L 1 9 z" fill="#E4E4E7" />
+          </marker>
+          <marker id="tickLimeStart" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M 9 1 L 1 5 L 9 9 z" fill="#A3E635" />
+          </marker>
+          <marker id="tickLimeEnd" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M 1 1 L 9 5 L 1 9 z" fill="#A3E635" />
+          </marker>
+          <pattern id="pcbHatch" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+            <line x1="0" y1="0" x2="0" y2="8" stroke="#27272A" stroke-width="1.5" />
+          </pattern>
+          <marker id="arrowCyanStart" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 9 1 L 1 5 L 9 9 z" fill="#00D2FF" /></marker>
+          <marker id="arrowCyanEnd" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 1 1 L 9 5 L 1 9 z" fill="#00D2FF" /></marker>
+          <marker id="arrowEmeraldStart" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 9 1 L 1 5 L 9 9 z" fill="#A3E635" /></marker>
+          <marker id="arrowEmeraldEnd" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 1 1 L 9 5 L 1 9 z" fill="#A3E635" /></marker>
+          <marker id="arrowAmberStart" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 9 1 L 1 5 L 9 9 z" fill="#F59E0B" /></marker>
+          <marker id="arrowAmberEnd" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 1 1 L 9 5 L 1 9 z" fill="#F59E0B" /></marker>
+          <marker id="arrowPurpleStart" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 9 1 L 1 5 L 9 9 z" fill="#E4E4E7" /></marker>
+          <marker id="arrowPurpleEnd" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 1 1 L 9 5 L 1 9 z" fill="#E4E4E7" /></marker>
+          <marker id="arrowPinkStart" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 9 1 L 1 5 L 9 9 z" fill="#FF5722" /></marker>
+          <marker id="arrowPinkEnd" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 1 1 L 9 5 L 1 9 z" fill="#FF5722" /></marker>
+          <linearGradient id="copperGrad"><stop offset="0%" stop-color="#FF5722" /></linearGradient>
+          <linearGradient id="metalGrad"><stop offset="0%" stop-color="#71717A" /></linearGradient>
+        </defs>
+      `;
+    }
+
+    function dimArrowH(id, x1, x2, y, extY1, extY2, label, colorKey = 'Orange', activeId = null) {
+      const colorMap = {
+        Orange: '#FF5722',
+        Cyan: '#00D2FF',
+        Amber: '#F59E0B',
+        White: '#E4E4E7',
+        Lime: '#A3E635'
+      };
+      const stroke = colorMap[colorKey] || '#FF5722';
+      const isHi = activeId === id;
+      const midX = (x1 + x2) / 2;
+      const boxW = Math.max(88, label.length * 7.2 + 14);
+      const opacity = activeId && !isHi ? '0.28' : '1.0';
+      const hiClass = isHi ? 'svg-dim-group svg-dim-highlight' : 'svg-dim-group';
+
+      return `
+        <g class="${hiClass}" data-dim-id="${id}" style="opacity:${opacity}">
+          <line x1="${x1}" y1="${extY1}" x2="${x1}" y2="${y}" stroke="${stroke}" stroke-width="1" stroke-dasharray="2,2" opacity="0.65" />
+          <line x1="${x2}" y1="${extY2}" x2="${x2}" y2="${y}" stroke="${stroke}" stroke-width="1" stroke-dasharray="2,2" opacity="0.65" />
+          <line x1="${x1 + 2}" y1="${y}" x2="${x2 - 2}" y2="${y}" stroke="${stroke}" stroke-width="${isHi ? 2.2 : 1.3}"
+            marker-start="url(#tick${colorKey}Start)" marker-end="url(#tick${colorKey}End)" />
+          <rect x="${midX - boxW / 2}" y="${y - 10}" width="${boxW}" height="20"
+            fill="#0B0B0E" stroke="${isHi ? '#FF5722' : stroke}" stroke-width="${isHi ? 1.8 : 1}" />
+          <text x="${midX}" y="${y + 4}" text-anchor="middle" fill="${isHi ? '#FFFFFF' : stroke}"
+            font-family="JetBrains Mono, monospace" font-size="11" font-weight="600">${label}</text>
+        </g>
+      `;
+    }
+
+    function dimArrowV(id, x, y1, y2, extX1, extX2, label, colorKey = 'Orange', activeId = null) {
+      const colorMap = {
+        Orange: '#FF5722',
+        Cyan: '#00D2FF',
+        Amber: '#F59E0B',
+        White: '#E4E4E7',
+        Lime: '#A3E635'
+      };
+      const stroke = colorMap[colorKey] || '#FF5722';
+      const isHi = activeId === id;
+      const midY = (y1 + y2) / 2;
+      const boxW = Math.max(88, label.length * 7.2 + 14);
+      const opacity = activeId && !isHi ? '0.28' : '1.0';
+      const hiClass = isHi ? 'svg-dim-group svg-dim-highlight' : 'svg-dim-group';
+
+      return `
+        <g class="${hiClass}" data-dim-id="${id}" style="opacity:${opacity}">
+          <line x1="${extX1}" y1="${y1}" x2="${x}" y2="${y1}" stroke="${stroke}" stroke-width="1" stroke-dasharray="2,2" opacity="0.65" />
+          <line x1="${extX2}" y1="${y2}" x2="${x}" y2="${y2}" stroke="${stroke}" stroke-width="1" stroke-dasharray="2,2" opacity="0.65" />
+          <line x1="${x}" y1="${y1 + 2}" x2="${x}" y2="${y2 - 2}" stroke="${stroke}" stroke-width="${isHi ? 2.2 : 1.3}"
+            marker-start="url(#tick${colorKey}Start)" marker-end="url(#tick${colorKey}End)" />
+          <rect x="${x - boxW / 2}" y="${midY - 10}" width="${boxW}" height="20"
+            fill="#0B0B0E" stroke="${isHi ? '#FF5722' : stroke}" stroke-width="${isHi ? 1.8 : 1}" />
+          <text x="${x}" y="${midY + 4}" text-anchor="middle" fill="${isHi ? '#FFFFFF' : stroke}"
+            font-family="JetBrains Mono, monospace" font-size="11" font-weight="600">${label}</text>
+        </g>
+      `;
+    }
+
+    function renderBlueprintSvg(model) {
+      const svg = document.getElementById('antennaSvgCanvas');
+      const activeId = state.lockedHighlightId || state.highlightedId;
+      const meta = ANTENNA_TYPES.find(t => t.id === state.antennaType) || ANTENNA_TYPES[0];
+      const dMap = {};
+      model.dimensions.forEach(d => { dMap[d.id] = d; });
+
+      let content = createSvgDefs();
+
+      // Technical CAD Border & Corner Registration Marks
+      content += `
+        <rect x="10" y="10" width="880" height="420" fill="none" stroke="#26262E" stroke-width="1" />
+        <path d="M 10 26 L 26 26 L 26 10 M 874 10 L 874 26 L 890 26 M 10 414 L 26 414 L 26 430 M 874 430 L 874 414 L 890 414" fill="none" stroke="#52525B" stroke-width="1" />
+        <text x="20" y="27" fill="#71717A" font-family="JetBrains Mono, monospace" font-size="10">
+          DWG // ${meta.code} — f₀: ${model.freqMHz.toFixed(2)} MHz | λ₀: ${formatLen(model.lambdaMm)} | VF: ${state.vf.toFixed(3)}
+        </text>
+        <!-- Engineering Title Block (Bottom Right) -->
+        <g transform="translate(650, 382)">
+          <rect x="0" y="0" width="234" height="42" fill="#0E0E12" stroke="#2C2C35" stroke-width="1" />
+          <line x1="0" y1="21" x2="234" y2="21" stroke="#26262E" stroke-width="1" />
+          <line x1="140" y1="0" x2="140" y2="42" stroke="#26262E" stroke-width="1" />
+          <text x="8" y="14" fill="#E4E4E7" font-family="JetBrains Mono, monospace" font-size="9.5" font-weight="700">TARANGAM // KADIR-YANTRA</text>
+          <text x="148" y="14" fill="#FF5722" font-family="JetBrains Mono, monospace" font-size="9.5" font-weight="700">UNIT: ${state.unit.toUpperCase()}</text>
+          <text x="8" y="34" fill="#71717A" font-family="JetBrains Mono, monospace" font-size="9">TOPOLOGY: ${meta.id.toUpperCase()}</text>
+          <text x="148" y="34" fill="#71717A" font-family="JetBrains Mono, monospace" font-size="9">TOL: ±0.1%</text>
+        </g>
+      `;
+
+      if (model.type === 'dipole') {
+        const yElem = 195;
+        const leftTip = 120;
+        const rightTip = 780;
+        const gapLeft = 432;
+        const gapRight = 468;
+
+        content += `
+          <!-- Center Axis Line -->
+          <line x1="450" y1="45" x2="450" y2="375" stroke="#27272A" stroke-width="1" stroke-dasharray="10,4,2,4" />
+          <!-- Coax Feedline & Balun Housing -->
+          <rect x="442" y="220" width="16" height="140" fill="#141418" stroke="#52525B" stroke-width="1.2" />
+          <line x1="450" y1="220" x2="450" y2="360" stroke="#FF5722" stroke-width="1.2" stroke-dasharray="3,3" />
+          <rect x="415" y="218" width="70" height="32" fill="#0B0B0E" stroke="#E4E4E7" stroke-width="1.2" />
+          <text x="450" y="238" text-anchor="middle" fill="#E4E4E7" font-family="JetBrains Mono" font-size="9.5" font-weight="600">1:1 BALUN</text>
+          <path d="M 435 218 L 435 198 M 465 218 L 465 198" stroke="#00D2FF" stroke-width="1.5" />
+
+          <!-- Left & Right Dipole Elements -->
+          <rect x="${leftTip}" y="${yElem - 5}" width="${gapLeft - leftTip}" height="10" fill="#18181D" stroke="#F4F4F6" stroke-width="1.6" />
+          <rect x="${gapRight}" y="${yElem - 5}" width="${rightTip - gapRight}" height="10" fill="#18181D" stroke="#F4F4F6" stroke-width="1.6" />
+
+          <!-- Current Distribution Curve I(z) -->
+          <path d="M ${leftTip} ${yElem - 8} Q 450 ${yElem - 110} ${rightTip} ${yElem - 8}" fill="none" stroke="#FF5722" stroke-width="1.2" stroke-dasharray="4,4" opacity="0.7" />
+          <text x="450" y="${yElem - 66}" text-anchor="middle" fill="#FF5722" font-family="JetBrains Mono" font-size="9.5">I(z) STANDING WAVE ENVELOPE</text>
+        `;
+
+        content += dimArrowH('L_total', leftTip, rightTip, 88, yElem - 5, yElem - 5, `L = ${formatLen(dMap.L_total.mm)}`, 'Orange', activeId);
+        content += dimArrowH('L_arm', leftTip, gapLeft, 142, yElem - 5, yElem - 5, `L₁ = ${formatLen(dMap.L_arm.mm)}`, 'Cyan', activeId);
+        content += dimArrowH('L_arm', gapRight, rightTip, 142, yElem - 5, yElem - 5, `L₂ = ${formatLen(dMap.L_arm.mm)}`, 'Cyan', activeId);
+        content += dimArrowH('g_feed', gapLeft, gapRight, 290, yElem + 5, yElem + 5, `g = ${formatLen(dMap.g_feed.mm)}`, 'Amber', activeId);
+        content += dimArrowV('d_wire', 795, yElem - 24, yElem + 24, rightTip, rightTip, `d = ${formatLen(dMap.d_wire.mm)}`, 'White', activeId);
+
+      } else if (model.type === 'monopole') {
+        const cx = 450;
+        const baseY = 235;
+        const topY = 70;
+        const radLeftX = 250;
+        const radRightX = 650;
+        const radBotY = 355;
+
+        content += `
+          <line x1="${cx}" y1="40" x2="${cx}" y2="390" stroke="#27272A" stroke-width="1" stroke-dasharray="10,4,2,4" />
+          <rect x="${cx - 9}" y="${baseY}" width="18" height="140" fill="#141418" stroke="#52525B" stroke-width="1.2" />
+          <rect x="${cx - 24}" y="${baseY - 8}" width="48" height="18" fill="#0B0B0E" stroke="#E4E4E7" stroke-width="1.3" />
+          <text x="${cx}" y="${baseY + 4}" text-anchor="middle" fill="#E4E4E7" font-family="JetBrains Mono" font-size="8.5">BULKHEAD</text>
+
+          <!-- 4 Ground Radials -->
+          <line x1="${cx - 18}" y1="${baseY + 4}" x2="${radLeftX}" y2="${radBotY}" stroke="#00D2FF" stroke-width="3.2" />
+          <line x1="${cx + 18}" y1="${baseY + 4}" x2="${radRightX}" y2="${radBotY}" stroke="#00D2FF" stroke-width="3.2" />
+          <line x1="${cx - 10}" y1="${baseY + 6}" x2="${cx - 110}" y2="${radBotY - 25}" stroke="#00D2FF" stroke-width="2" stroke-dasharray="4,2" opacity="0.55" />
+          <line x1="${cx + 10}" y1="${baseY + 6}" x2="${cx + 110}" y2="${radBotY - 25}" stroke="#00D2FF" stroke-width="2" stroke-dasharray="4,2" opacity="0.55" />
+
+          <!-- Vertical Quarter-Wave Whip -->
+          <rect x="${cx - 3.5}" y="${topY}" width="7" height="${baseY - topY - 8}" fill="#18181D" stroke="#FF5722" stroke-width="1.8" />
+
+          <!-- Droop Angle Callout -->
+          <path d="M ${cx + 65} ${baseY + 4} A 65 65 0 0 1 ${cx + 50} ${baseY + 42}" fill="none" stroke="#F59E0B" stroke-width="1.3" />
+          <line x1="${cx + 18}" y1="${baseY + 4}" x2="${cx + 85}" y2="${baseY + 4}" stroke="#52525B" stroke-width="1" stroke-dasharray="3,3" />
+          <text x="${cx + 92}" y="${baseY + 25}" fill="#F59E0B" font-family="JetBrains Mono" font-size="10">θ = ${state.monopoleRadialAngleDeg}°</text>
+        `;
+
+        content += dimArrowV('L_vert', 310, topY, baseY - 8, cx - 4, cx - 24, `L_v = ${formatLen(dMap.L_vert.mm)}`, 'Orange', activeId);
+        content += dimArrowH('D_span', radLeftX, radRightX, 396, radBotY, radBotY, `D_base = ${formatLen(dMap.D_span.mm)}`, 'Amber', activeId);
+        content += dimArrowV('H_skirt', 725, baseY + 4, radBotY, cx + 24, radRightX, `H_drop = ${formatLen(dMap.H_skirt.mm)}`, 'White', activeId);
+        content += dimArrowH('L_rad', radLeftX, cx - 18, 290, radBotY, baseY + 4, `L_r (×4) = ${formatLen(dMap.L_rad.mm)}`, 'Cyan', activeId);
+
+      } else if (model.type === 'yagi') {
+        const ym = model.yagiMeta;
+        const n = ym.nElem;
+        const boomStartX = 130;
+        const boomEndX = 740;
+        const boomY = 220;
+
+        const elemPositions = [];
+        const totalPhysicalSpan = ym.sRefDe + (n - 2) * ym.sDir;
+        const drawSpan = boomEndX - boomStartX - 50;
+        const xRef = boomStartX + 25;
+        const xDe = xRef + (ym.sRefDe / totalPhysicalSpan) * drawSpan;
+        elemPositions.push({ x: xRef, halfH: 132, label: 'REF', color: '#F59E0B', dimId: 'L_ref' });
+        elemPositions.push({ x: xDe, halfH: 122, label: 'DE', color: '#FF5722', dimId: 'L_de' });
+
+        for (let i = 0; i < n - 2; i++) {
+          const xDir = xDe + ((i + 1) * ym.sDir / totalPhysicalSpan) * drawSpan;
+          const halfH = 112 - i * (18 / Math.max(1, n - 3));
+          elemPositions.push({
+            x: xDir,
+            halfH,
+            label: `D${i + 1}`,
+            color: '#00D2FF',
+            dimId: i === 0 ? 'L_d1' : (i === n - 3 ? 'L_dn' : 'L_d1')
+          });
+        }
+
+        content += `
+          <rect x="${boomStartX}" y="${boomY - 4}" width="${boomEndX - boomStartX}" height="8" fill="#18181D" stroke="#71717A" stroke-width="1.2" />
+          <path d="M 760 ${boomY} L 835 ${boomY}" stroke="#FF5722" stroke-width="2" marker-end="url(#tickOrangeEnd)" />
+          <text x="798" y="${boomY - 10}" text-anchor="middle" fill="#FF5722" font-family="JetBrains Mono" font-size="9.5" font-weight="700">+Z BORESIGHT</text>
+        `;
+
+        elemPositions.forEach((el) => {
+          const isElHi = activeId === el.dimId;
+          content += `
+            <g class="svg-dim-group" data-dim-id="${el.dimId}">
+              <line x1="${el.x}" y1="${boomY - el.halfH}" x2="${el.x}" y2="${boomY + el.halfH}"
+                stroke="${isElHi ? '#FFFFFF' : el.color}" stroke-width="${isElHi ? 4.5 : 3}" />
+              <rect x="${el.x - 4}" y="${boomY - 4}" width="8" height="8" fill="#09090B" stroke="${el.color}" stroke-width="1.4" />
+              <text x="${el.x}" y="${boomY + el.halfH + 15}" text-anchor="middle" fill="${el.color}" font-family="JetBrains Mono" font-size="9.5" font-weight="600">${el.label}</text>
+            </g>
+          `;
+        });
+
+        content += dimArrowV('L_ref', 68, boomY - 132, boomY + 132, xRef, xRef, `L_Ref = ${formatLen(dMap.L_ref.mm)}`, 'Amber', activeId);
+        content += dimArrowH('S_ref', xRef, xDe, 58, boomY - 132, boomY - 122, `S_Ref = ${formatLen(dMap.S_ref.mm)}`, 'White', activeId);
+        if (elemPositions.length >= 3) {
+          content += dimArrowH('S_dir', elemPositions[1].x, elemPositions[2].x, 90, boomY - 122, boomY - 112, `S_Dir = ${formatLen(dMap.S_dir.mm)}`, 'Lime', activeId);
+          content += dimArrowV('L_d1', 810, boomY - elemPositions[elemPositions.length - 1].halfH, boomY + elemPositions[elemPositions.length - 1].halfH, elemPositions[elemPositions.length - 1].x, elemPositions[elemPositions.length - 1].x, `L_D1 = ${formatLen(dMap.L_d1.mm)}`, 'Cyan', activeId);
+        }
+        content += dimArrowH('B_total', boomStartX, boomEndX, 392, boomY + 4, boomY + 4, `Boom B = ${formatLen(dMap.B_total.mm)}`, 'Orange', activeId);
+
+      } else if (model.type === 'patch') {
+        const gndX = 200, gndY = 62, gndW = 440, gndH = 280;
+        const pX = 275, pY = 104, pW = 290, pH = 178;
+        const notchW = 44, notchDepth = 54;
+        const feedW = 18;
+        const cx = pX + pW / 2;
+
+        const patchPoints = [
+          `${pX},${pY}`,
+          `${pX + pW},${pY}`,
+          `${pX + pW},${pY + pH}`,
+          `${cx + notchW / 2},${pY + pH}`,
+          `${cx + notchW / 2},${pY + pH - notchDepth}`,
+          `${cx + feedW / 2},${pY + pH - notchDepth}`,
+          `${cx + feedW / 2},${gndY + gndH}`,
+          `${cx - feedW / 2},${gndY + gndH}`,
+          `${cx - feedW / 2},${pY + pH - notchDepth}`,
+          `${cx - notchW / 2},${pY + pH - notchDepth}`,
+          `${cx - notchW / 2},${pY + pH}`,
+          `${pX},${pY + pH}`
+        ].join(' ');
+
+        content += `
+          <!-- Dielectric Laminate & Ground Plane -->
+          <rect x="${gndX}" y="${gndY}" width="${gndW}" height="${gndH}" fill="url(#pcbHatch)" stroke="#52525B" stroke-width="1.5" />
+          <text x="${gndX + 10}" y="${gndY + 18}" fill="#A1A1AA" font-family="JetBrains Mono" font-size="9.5">DIELECTRIC SUBSTRATE [ε_r = ${state.patchEr}, h = ${state.patchHeightMm} mm]</text>
+
+          <!-- Radiating Fringing Slots -->
+          <rect x="${pX}" y="${pY - 8}" width="${pW}" height="6" fill="none" stroke="#00D2FF" stroke-dasharray="3,3" />
+          <rect x="${pX}" y="${pY + pH + 2}" width="${pW}" height="6" fill="none" stroke="#00D2FF" stroke-dasharray="3,3" />
+
+          <!-- Top Copper Layer Patch -->
+          <polygon points="${patchPoints}" fill="#1F1614" stroke="#FF5722" stroke-width="1.8" />
+          <text x="${cx}" y="${pY + 62}" text-anchor="middle" fill="#F4F4F6" font-family="JetBrains Mono" font-size="11" font-weight="700">CU LAYER 1 // PATCH</text>
+        `;
+
+        content += dimArrowH('W_patch', pX, pX + pW, 36, pY, pY, `W = ${formatLen(dMap.W_patch.mm)}`, 'Orange', activeId);
+        content += dimArrowV('L_patch', 120, pY, pY + pH, pX, pX, `L = ${formatLen(dMap.L_patch.mm)}`, 'Cyan', activeId);
+        content += dimArrowV('y0_inset', 720, pY + pH - notchDepth, pY + pH, cx + notchW / 2, cx + notchW / 2, `y₀ = ${formatLen(dMap.y0_inset.mm)}`, 'Amber', activeId);
+        content += dimArrowH('W_feed', cx - feedW / 2, cx + feedW / 2, 372, gndY + gndH, gndY + gndH, `W_f = ${formatLen(dMap.W_feed.mm)}`, 'Lime', activeId);
+        content += dimArrowH('Gnd_dim', gndX, gndX + gndW, 408, gndY + gndH, gndY + gndH, `W_g = ${formatLen(dMap.Gnd_dim.mm)}`, 'White', activeId);
+
+      } else if (model.type === 'helix') {
+        const hm = model.helixMeta;
+        const turns = Math.min(12, hm.turns);
+        const refX = 175;
+        const topY = 135;
+        const botY = 275;
+        const helixStartX = 190;
+        const helixEndX = 700;
+        const turnW = (helixEndX - helixStartX) / turns;
+
+        content += `
+          <rect x="${refX - 6}" y="78" width="12" height="254" fill="#18181D" stroke="#E4E4E7" stroke-width="1.5" />
+          <rect x="${refX + 6}" y="${(topY + botY) / 2 - 4}" width="${helixEndX - refX + 15}" height="8" fill="#141418" stroke="#3F3F46" />
+        `;
+
+        let pathBack = '';
+        let pathFront = '';
+        for (let i = 0; i < turns; i++) {
+          const x0 = helixStartX + i * turnW;
+          const xMid = x0 + turnW * 0.5;
+          const x1 = x0 + turnW;
+          pathFront += `M ${x0} ${botY} C ${x0 + turnW * 0.2} ${botY}, ${xMid - turnW * 0.2} ${topY}, ${xMid} ${topY} `;
+          pathBack += `M ${xMid} ${topY} C ${xMid + turnW * 0.2} ${topY}, ${x1 - turnW * 0.2} ${botY}, ${x1} ${botY} `;
+        }
+
+        content += `
+          <path d="${pathBack}" fill="none" stroke="#52525B" stroke-width="2.5" stroke-dasharray="4,3" />
+          <path d="${pathFront}" fill="none" stroke="#FF5722" stroke-width="3.5" stroke-linecap="round" />
+        `;
+
+        content += dimArrowV('D_gnd', 95, 78, 332, refX - 6, refX - 6, `D_ref = ${formatLen(dMap.D_gnd.mm)}`, 'White', activeId);
+        content += dimArrowV('D_helix', 785, topY, botY, helixEndX, helixEndX, `D = ${formatLen(dMap.D_helix.mm)}`, 'Orange', activeId);
+        content += dimArrowH('S_turn', helixStartX + turnW * 0.5, helixStartX + turnW * 1.5, 82, topY, topY, `S = ${formatLen(dMap.S_turn.mm)}`, 'Cyan', activeId);
+        content += dimArrowH('A_axial', helixStartX, helixEndX, 342, botY, botY, `A = ${formatLen(dMap.A_axial.mm)} (${hm.turns}T)`, 'Amber', activeId);
+        content += dimArrowH('L_wire_tot', helixStartX, helixEndX, 376, botY, botY, `Wire = ${formatLen(dMap.L_wire_tot.mm)}`, 'Lime', activeId);
+
+      } else if (model.type === 'jpole') {
+        const leftShortX = 160;
+        const stubEndX = 370;
+        const longEndX = 750;
+        const topRailY = 165;
+        const botRailY = 255;
+        const tapX = 225;
+
+        content += `
+          <rect x="${leftShortX}" y="${topRailY - 5}" width="${longEndX - leftShortX}" height="10" fill="#18181D" stroke="#FF5722" stroke-width="1.6" />
+          <rect x="${leftShortX}" y="${botRailY - 5}" width="${stubEndX - leftShortX}" height="10" fill="#18181D" stroke="#00D2FF" stroke-width="1.6" />
+          <rect x="${leftShortX - 4}" y="${topRailY - 5}" width="12" height="${botRailY - topRailY + 10}" fill="#18181D" stroke="#E4E4E7" stroke-width="1.6" />
+
+          <circle cx="${tapX}" cy="${topRailY}" r="4.5" fill="#F59E0B" />
+          <circle cx="${tapX}" cy="${botRailY}" r="4.5" fill="#F59E0B" />
+          <line x1="${tapX}" y1="${topRailY + 5}" x2="${tapX}" y2="${botRailY - 5}" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="3,3" />
+          <text x="${tapX + 10}" y="${(topRailY + botRailY) / 2 + 4}" fill="#F59E0B" font-family="JetBrains Mono" font-size="9.5" font-weight="600">50Ω FEED TAP</text>
+        `;
+
+        content += dimArrowH('L_long', leftShortX, longEndX, 75, topRailY - 5, topRailY - 5, `L_A = ${formatLen(dMap.L_long.mm)}`, 'Orange', activeId);
+        content += dimArrowH('L_rad_top', stubEndX, longEndX, 122, topRailY - 5, topRailY - 5, `L_rad = ${formatLen(dMap.L_rad_top.mm)}`, 'Lime', activeId);
+        content += dimArrowH('L_stub', leftShortX, stubEndX, 320, botRailY + 5, botRailY + 5, `L_B = ${formatLen(dMap.L_stub.mm)}`, 'Cyan', activeId);
+        content += dimArrowH('L_tap', leftShortX, tapX, 368, botRailY + 5, botRailY + 5, `L_C = ${formatLen(dMap.L_tap.mm)}`, 'Amber', activeId);
+        content += dimArrowV('S_gap', 92, topRailY, botRailY, leftShortX, leftShortX, `S = ${formatLen(dMap.S_gap.mm)}`, 'White', activeId);
+
+      } else if (model.type === 'ifa') {
+        const gndY = 275;
+        const armY = 140;
+        const shortX = 230;
+        const feedX = 355;
+        const armEndX = 680;
+
+        content += `
+          <rect x="140" y="${gndY}" width="520" height="95" fill="url(#pcbHatch)" stroke="#52525B" stroke-width="1.6" />
+          <text x="400" y="${gndY + 52}" text-anchor="middle" fill="#A1A1AA" font-family="JetBrains Mono" font-size="11" font-weight="700">COPPER GROUND PLANE [GND]</text>
+
+          <rect x="${shortX - 7}" y="${armY}" width="14" height="${gndY - armY + 5}" fill="#18181D" stroke="#00D2FF" stroke-width="1.6" />
+          <circle cx="${shortX}" cy="${gndY + 10}" r="4" fill="#00D2FF" />
+          <text x="${shortX}" y="${gndY + 26}" text-anchor="middle" fill="#00D2FF" font-family="JetBrains Mono" font-size="9">VIA</text>
+
+          <rect x="${feedX - 6}" y="${armY + 7}" width="12" height="${gndY - armY - 7}" fill="#18181D" stroke="#F59E0B" stroke-width="1.6" />
+          <rect x="${feedX - 16}" y="${gndY - 7}" width="32" height="14" fill="#09090B" stroke="#F59E0B" stroke-width="1.4" />
+          <text x="${feedX}" y="${gndY + 26}" text-anchor="middle" fill="#F59E0B" font-family="JetBrains Mono" font-size="9">50Ω PORT</text>
+
+          <rect x="${shortX - 7}" y="${armY - 7}" width="${armEndX - shortX + 7}" height="14" fill="#18181D" stroke="#FF5722" stroke-width="1.8" />
+        `;
+
+        content += dimArrowH('L_ifa_arm', shortX - 7, armEndX, 78, armY - 7, armY - 7, `L_arm = ${formatLen(dMap.L_ifa_arm.mm)}`, 'Orange', activeId);
+        content += dimArrowV('H_ifa_short', 135, armY, gndY, shortX - 7, shortX - 7, `H_short = ${formatLen(dMap.H_ifa_short.mm)}`, 'Cyan', activeId);
+        content += dimArrowH('D_ifa_feed', shortX, feedX, 212, armY + 7, armY + 7, `D_feed = ${formatLen(dMap.D_ifa_feed.mm)}`, 'Amber', activeId);
+        content += dimArrowV('W_ifa_trace', 755, armY - 7, armY + 7, armEndX, armEndX, `W_t = ${formatLen(dMap.W_ifa_trace.mm)}`, 'White', activeId);
+      }
+
+      svg.innerHTML = content;
+
+      svg.querySelectorAll('.svg-dim-group').forEach(group => {
+        const dimId = group.getAttribute('data-dim-id');
+        group.addEventListener('mouseenter', () => {
+          if (!state.lockedHighlightId) {
+            state.highlightedId = dimId;
+            syncHighlightUI(model);
+          }
+        });
+        group.addEventListener('mouseleave', () => {
+          if (!state.lockedHighlightId) {
+            state.highlightedId = null;
+            syncHighlightUI(model);
+          }
+        });
+        group.addEventListener('click', (e) => {
+          e.stopPropagation();
+          if (state.lockedHighlightId === dimId) {
+            state.lockedHighlightId = null;
+            state.highlightedId = null;
+          } else {
+            state.lockedHighlightId = dimId;
+            state.highlightedId = dimId;
+          }
+          renderAll();
+        });
+      });
+    }
+
+    // =========================================================================
+    // Polar Radiation Pattern & VSWR Curve Canvas Renderers
+    // =========================================================================
+    function renderPolarAndVswrCharts(model) {
+      const polarCanvas = document.getElementById('polarPatternCanvas');
+      const vswrCanvas = document.getElementById('vswrChartCanvas');
+      if (!polarCanvas || !vswrCanvas) return;
+
+      const pCtx = polarCanvas.getContext('2d');
+      const w = polarCanvas.width;
+      const h = polarCanvas.height;
+      const cx = w / 2;
+      const cy = h / 2;
+      const maxR = Math.min(cx, cy) - 24;
+
+      pCtx.clearRect(0, 0, w, h);
+
+      pCtx.strokeStyle = 'rgba(255, 255, 255, 0.14)';
+      pCtx.lineWidth = 1;
+      [0.25, 0.5, 0.75, 1.0].forEach(frac => {
+        pCtx.beginPath();
+        pCtx.arc(cx, cy, maxR * frac, 0, Math.PI * 2);
+        pCtx.stroke();
+      });
+
+      for (let deg = 0; deg < 360; deg += 30) {
+        const rad = (deg * Math.PI) / 180;
+        pCtx.beginPath();
+        pCtx.moveTo(cx, cy);
+        pCtx.lineTo(cx + Math.cos(rad) * maxR, cy + Math.sin(rad) * maxR);
+        pCtx.stroke();
+      }
+
+      function getGainAtAngle(thetaRad, plane) {
+        if (model.type === 'dipole' || model.type === 'jpole') {
+          if (plane === 'H') return 0.92;
+          const s = Math.abs(Math.sin(thetaRad));
+          return Math.pow(s, 1.35);
+        }
+        if (model.type === 'monopole') {
+          if (plane === 'H') return 0.95;
+          return Math.max(0.12, Math.abs(Math.cos(thetaRad)) * 0.95);
+        }
+        if (model.type === 'yagi') {
+          const n = state.yagiElements;
+          const forward = Math.max(0, Math.cos(thetaRad));
+          const backLobe = Math.max(0, -Math.cos(thetaRad)) * (0.22 / Math.sqrt(n - 1));
+          const sideLobe = Math.abs(Math.sin(thetaRad * 2)) * 0.14;
+          const p = plane === 'E' ? Math.pow(forward, n * 0.85) : Math.pow(forward, n * 0.65);
+          return Math.min(1, p + backLobe + sideLobe);
+        }
+        if (model.type === 'patch') {
+          const main = Math.max(0, Math.cos(thetaRad + Math.PI / 2));
+          const back = Math.max(0, -Math.cos(thetaRad + Math.PI / 2)) * 0.15;
+          return plane === 'E' ? Math.pow(main, 1.8) + back : Math.pow(main, 2.3) + back;
+        }
+        if (model.type === 'helix') {
+          const main = Math.max(0, Math.cos(thetaRad));
+          const back = Math.max(0, -Math.cos(thetaRad)) * 0.12;
+          return Math.pow(main, Math.max(2.2, state.helixTurns * 0.45)) + back;
+        }
+        return plane === 'H' ? 0.82 + 0.15 * Math.cos(thetaRad * 2) : 0.65 + 0.32 * Math.abs(Math.sin(thetaRad));
+      }
+
+      // Draw H-Plane (#00D2FF)
+      pCtx.beginPath();
+      for (let i = 0; i <= 360; i += 2) {
+        const rad = (i * Math.PI) / 180;
+        const r = getGainAtAngle(rad, 'H') * maxR;
+        const x = cx + Math.cos(rad) * r;
+        const y = cy + Math.sin(rad) * r;
+        if (i === 0) pCtx.moveTo(x, y);
+        else pCtx.lineTo(x, y);
+      }
+      pCtx.closePath();
+      pCtx.fillStyle = 'rgba(0, 210, 255, 0.1)';
+      pCtx.fill();
+      pCtx.strokeStyle = '#00D2FF';
+      pCtx.lineWidth = 1.8;
+      pCtx.stroke();
+
+      // Draw E-Plane (#FF5722)
+      pCtx.beginPath();
+      for (let i = 0; i <= 360; i += 2) {
+        const rad = (i * Math.PI) / 180;
+        const r = getGainAtAngle(rad, 'E') * maxR;
+        const x = cx + Math.cos(rad) * r;
+        const y = cy + Math.sin(rad) * r;
+        if (i === 0) pCtx.moveTo(x, y);
+        else pCtx.lineTo(x, y);
+      }
+      pCtx.closePath();
+      pCtx.fillStyle = 'rgba(255, 87, 34, 0.16)';
+      pCtx.fill();
+      pCtx.strokeStyle = '#FF5722';
+      pCtx.lineWidth = 2.2;
+      pCtx.stroke();
+
+      // VSWR Sweep Plot
+      const vCtx = vswrCanvas.getContext('2d');
+      const vw = vswrCanvas.width;
+      const vh = vswrCanvas.height;
+      vCtx.clearRect(0, 0, vw, vh);
+
+      const padL = 42, padR = 18, padT = 18, padB = 30;
+      const plotW = vw - padL - padR;
+      const plotH = vh - padT - padB;
+
+      vCtx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+      vCtx.fillStyle = '#71717A';
+      vCtx.font = '10px JetBrains Mono, monospace';
+      [1.0, 1.5, 2.0, 3.0].forEach(swr => {
+        const normY = (swr - 1.0) / 2.5;
+        const y = padT + plotH - normY * plotH;
+        vCtx.beginPath();
+        vCtx.moveTo(padL, y);
+        vCtx.lineTo(padL + plotW, y);
+        vCtx.stroke();
+        vCtx.fillText(`${swr.toFixed(1)}:1`, 6, y + 3);
+      });
+
+      const y2 = padT + plotH - ((2.0 - 1.0) / 2.5) * plotH;
+      vCtx.strokeStyle = 'rgba(245, 158, 11, 0.65)';
+      vCtx.setLineDash([4, 4]);
+      vCtx.beginPath();
+      vCtx.moveTo(padL, y2);
+      vCtx.lineTo(padL + plotW, y2);
+      vCtx.stroke();
+      vCtx.setLineDash([]);
+
+      const bwFrac = model.vswrBwPercent / 100;
+      vCtx.beginPath();
+      for (let i = 0; i <= 100; i++) {
+        const frac = (i / 100 - 0.5) * 0.24;
+        const swr = Math.min(3.5, 1.05 + Math.pow(frac / (bwFrac * 0.5), 2) * 0.95);
+        const x = padL + (i / 100) * plotW;
+        const y = padT + plotH - ((swr - 1.0) / 2.5) * plotH;
+        if (i === 0) vCtx.moveTo(x, y);
+        else vCtx.lineTo(x, y);
+      }
+      vCtx.strokeStyle = '#FF5722';
+      vCtx.lineWidth = 2.2;
+      vCtx.stroke();
+
+      const centerDotY = padT + plotH - ((1.05 - 1.0) / 2.5) * plotH;
+      vCtx.fillStyle = '#00D2FF';
+      vCtx.beginPath();
+      vCtx.arc(padL + plotW / 2, centerDotY, 4, 0, Math.PI * 2);
+      vCtx.fill();
+
+      const f0 = model.freqMHz;
+      vCtx.fillStyle = '#71717A';
+      vCtx.textAlign = 'center';
+      vCtx.fillText(`${(f0 * 0.9).toFixed(1)} MHz`, padL + plotW * 0.1, vh - 8);
+      vCtx.fillStyle = '#F4F4F6';
+      vCtx.fillText(`f₀ = ${f0.toFixed(1)} MHz`, padL + plotW * 0.5, vh - 8);
+      vCtx.fillStyle = '#71717A';
+      vCtx.fillText(`${(f0 * 1.1).toFixed(1)} MHz`, padL + plotW * 0.9, vh - 8);
+
+      document.getElementById('vswrCenterFreqLabel').textContent = `${f0.toFixed(2)} MHz`;
+      document.getElementById('bandwidthBadge').textContent = `BW (2:1) ≈ ${(f0 * bwFrac).toFixed(1)} MHz (${model.vswrBwPercent.toFixed(1)}%)`;
+    }
+
+    // =========================================================================
+    // UI Synchronization & Dynamic Controls
+    // =========================================================================
+    function renderAntennaTypeBar() {
+      const bar = document.getElementById('antennaTypeBar');
+      bar.innerHTML = ANTENNA_TYPES.map(t => {
+        const isActive = t.id === state.antennaType;
+        return `
+          <button type="button" data-antenna="${t.id}"
+            class="antenna-tab-btn text-left px-3 py-2 border transition ${
+              isActive
+                ? 'tab-active'
+                : 'bg-[#121216] border-[#24242C] text-[#A1A1AA] hover:text-white hover:border-[#3F3F46]'
+            }">
+            <div class="flex items-center justify-between text-[10px] font-mono text-[#71717A]">
+              <span>${t.code}</span>
+              <span class="${isActive ? 'text-[#FF5722]' : 'text-[#52525B]'}">●</span>
+            </div>
+            <div class="text-xs font-display font-bold truncate mt-0.5">${t.name}</div>
+            <div class="text-[10px] font-mono ${isActive ? 'text-[#D4D4D8]' : 'text-[#71717A]'} truncate">${t.shortSub}</div>
+          </button>
+        `;
+      }).join('');
+
+      bar.querySelectorAll('.antenna-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.antennaType = btn.getAttribute('data-antenna');
+          state.highlightedId = null;
+          state.lockedHighlightId = null;
+          renderSpecificConstraintsControls();
+          renderAll();
+        });
+      });
+    }
+
+    function renderSpecificConstraintsControls() {
+      const container = document.getElementById('specificConstraintsPanel');
+      const type = state.antennaType;
+
+      if (type === 'dipole') {
+        container.innerHTML = `
+          <div class="text-xs font-mono text-[#A1A1AA] flex items-center justify-between">
+            <span>CONFIG:</span>
+            <span class="text-white">CENTER-FED BALANCED λ/2</span>
+          </div>
+          <p class="text-[11px] font-mono text-[#71717A] leading-relaxed">
+            Adjust VF and Rod Diameter [d] above to compensate for jacket dielectric loading and capacitive tip effects.
+          </p>
+        `;
+      } else if (type === 'monopole') {
+        container.innerHTML = `
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <label for="monoAngleSlider" class="text-xs font-mono text-[#D4D4D8]">RADIAL DROOP ANGLE [θ]</label>
+              <span id="monoAngleVal" class="font-mono text-xs text-[#FF5722]">${state.monopoleRadialAngleDeg}°</span>
+            </div>
+            <input id="monoAngleSlider" type="range" min="0" max="60" step="5" value="${state.monopoleRadialAngleDeg}" class="w-full" />
+            <div class="flex justify-between text-[10px] font-mono text-[#52525B]">
+              <span>0° (36Ω)</span>
+              <span>45° (50Ω MATCH)</span>
+              <span>60° (56Ω)</span>
+            </div>
+          </div>
+        `;
+        const s = document.getElementById('monoAngleSlider');
+        s.addEventListener('input', () => {
+          state.monopoleRadialAngleDeg = parseFloat(s.value);
+          document.getElementById('monoAngleVal').textContent = `${state.monopoleRadialAngleDeg}°`;
+          renderAll();
+        });
+      } else if (type === 'yagi') {
+        container.innerHTML = `
+          <div class="space-y-3">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label for="yagiElemSlider" class="text-xs font-mono text-[#D4D4D8]">ELEMENT COUNT [N]</label>
+                <span id="yagiElemVal" class="font-mono text-xs text-[#FF5722]">${state.yagiElements} (1R, 1DE, ${state.yagiElements - 2}D)</span>
+              </div>
+              <input id="yagiElemSlider" type="range" min="3" max="10" step="1" value="${state.yagiElements}" class="w-full" />
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label for="yagiSpacingSlider" class="text-xs font-mono text-[#D4D4D8]">DIRECTOR PITCH [S_Dir]</label>
+                <span id="yagiSpacingVal" class="font-mono text-xs text-[#00D2FF]">${state.yagiDirectorSpacingLambda.toFixed(2)} λ</span>
+              </div>
+              <input id="yagiSpacingSlider" type="range" min="0.15" max="0.32" step="0.01" value="${state.yagiDirectorSpacingLambda}" class="w-full" />
+            </div>
+          </div>
+        `;
+        const elSlider = document.getElementById('yagiElemSlider');
+        const spSlider = document.getElementById('yagiSpacingSlider');
+        elSlider.addEventListener('input', () => {
+          state.yagiElements = parseInt(elSlider.value, 10);
+          document.getElementById('yagiElemVal').textContent = `${state.yagiElements} (1R, 1DE, ${state.yagiElements - 2}D)`;
+          renderAll();
+        });
+        spSlider.addEventListener('input', () => {
+          state.yagiDirectorSpacingLambda = parseFloat(spSlider.value);
+          document.getElementById('yagiSpacingVal').textContent = `${state.yagiDirectorSpacingLambda.toFixed(2)} λ`;
+          renderAll();
+        });
+      } else if (type === 'patch') {
+        container.innerHTML = `
+          <div class="space-y-3">
+            <div>
+              <label for="patchPresetSelect" class="block text-[10px] font-mono uppercase text-[#71717A] mb-1">LAMINATE SUBSTRATE</label>
+              <select id="patchPresetSelect" class="w-full px-2.5 py-1.5 bg-[#09090B] border border-[#2E2E38] text-xs font-mono text-[#D4D4D8] focus:outline-none">
+                <option value="4.4" ${state.patchEr === 4.4 ? 'selected' : ''}>Standard FR-4 Epoxy Glass (εr = 4.40)</option>
+                <option value="3.55" ${state.patchEr === 3.55 ? 'selected' : ''}>Rogers RO4003C High-Freq (εr = 3.55)</option>
+                <option value="2.2" ${state.patchEr === 2.2 ? 'selected' : ''}>Rogers RT/duroid 5880 PTFE (εr = 2.20)</option>
+                <option value="9.8" ${state.patchEr === 9.8 ? 'selected' : ''}>Alumina Ceramic 99.5% (εr = 9.80)</option>
+              </select>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label for="patchErInput" class="block text-[10px] font-mono text-[#71717A] mb-1">PERMITTIVITY [εr]</label>
+                <input id="patchErInput" type="number" min="1.1" max="15.0" step="0.05" value="${state.patchEr}"
+                  class="w-full px-2.5 py-1 bg-[#09090B] border border-[#2E2E38] font-mono text-xs text-white" />
+              </div>
+              <div>
+                <label for="patchHInput" class="block text-[10px] font-mono text-[#71717A] mb-1">THICKNESS [h, mm]</label>
+                <input id="patchHInput" type="number" min="0.2" max="10.0" step="0.1" value="${state.patchHeightMm}"
+                  class="w-full px-2.5 py-1 bg-[#09090B] border border-[#2E2E38] font-mono text-xs text-white" />
+              </div>
+            </div>
+          </div>
+        `;
+        const presetSel = document.getElementById('patchPresetSelect');
+        const erInp = document.getElementById('patchErInput');
+        const hInp = document.getElementById('patchHInput');
+        presetSel.addEventListener('change', () => {
+          state.patchEr = parseFloat(presetSel.value);
+          erInp.value = state.patchEr;
+          renderAll();
+        });
+        erInp.addEventListener('input', () => {
+          const val = parseFloat(erInp.value);
+          if (!isNaN(val) && val >= 1.05) {
+            state.patchEr = val;
+            renderAll();
+          }
+        });
+        hInp.addEventListener('input', () => {
+          const val = parseFloat(hInp.value);
+          if (!isNaN(val) && val >= 0.1) {
+            state.patchHeightMm = val;
+            renderAll();
+          }
+        });
+      } else if (type === 'helix') {
+        container.innerHTML = `
+          <div class="space-y-3">
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label for="helixTurnsSlider" class="text-xs font-mono text-[#D4D4D8]">COIL TURNS [N]</label>
+                <span id="helixTurnsVal" class="font-mono text-xs text-[#FF5722]">${state.helixTurns} Turns</span>
+              </div>
+              <input id="helixTurnsSlider" type="range" min="3" max="16" step="1" value="${state.helixTurns}" class="w-full" />
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label for="helixPitchSlider" class="text-xs font-mono text-[#D4D4D8]">PITCH ANGLE [α]</label>
+                <span id="helixPitchVal" class="font-mono text-xs text-[#00D2FF]">${state.helixPitchDeg}°</span>
+              </div>
+              <input id="helixPitchSlider" type="range" min="10" max="16" step="0.5" value="${state.helixPitchDeg}" class="w-full" />
+            </div>
+          </div>
+        `;
+        const tSlider = document.getElementById('helixTurnsSlider');
+        const pSlider = document.getElementById('helixPitchSlider');
+        tSlider.addEventListener('input', () => {
+          state.helixTurns = parseInt(tSlider.value, 10);
+          document.getElementById('helixTurnsVal').textContent = `${state.helixTurns} Turns`;
+          renderAll();
+        });
+        pSlider.addEventListener('input', () => {
+          state.helixPitchDeg = parseFloat(pSlider.value);
+          document.getElementById('helixPitchVal').textContent = `${state.helixPitchDeg}°`;
+          renderAll();
+        });
+      } else if (type === 'jpole') {
+        container.innerHTML = `
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <label for="jpoleGapSlider" class="text-xs font-mono text-[#D4D4D8]">STUB PITCH [S / λ]</label>
+              <span id="jpoleGapVal" class="font-mono text-xs text-[#FF5722]">${state.jpoleSpacingFactor.toFixed(3)} λ</span>
+            </div>
+            <input id="jpoleGapSlider" type="range" min="0.015" max="0.045" step="0.005" value="${state.jpoleSpacingFactor}" class="w-full" />
+          </div>
+        `;
+        const gSlider = document.getElementById('jpoleGapSlider');
+        gSlider.addEventListener('input', () => {
+          state.jpoleSpacingFactor = parseFloat(gSlider.value);
+          document.getElementById('jpoleGapVal').textContent = `${state.jpoleSpacingFactor.toFixed(3)} λ`;
+          renderAll();
+        });
+      } else if (type === 'ifa') {
+        container.innerHTML = `
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <label for="ifaHeightSlider" class="text-xs font-mono text-[#D4D4D8]">SHORTING HEIGHT [H / λ]</label>
+              <span id="ifaHeightVal" class="font-mono text-xs text-[#FF5722]">${state.ifaHeightFactor.toFixed(3)} λ</span>
+            </div>
+            <input id="ifaHeightSlider" type="range" min="0.02" max="0.08" step="0.005" value="${state.ifaHeightFactor}" class="w-full" />
+          </div>
+        `;
+        const hSlider = document.getElementById('ifaHeightSlider');
+        hSlider.addEventListener('input', () => {
+          state.ifaHeightFactor = parseFloat(hSlider.value);
+          document.getElementById('ifaHeightVal').textContent = `${state.ifaHeightFactor.toFixed(3)} λ`;
+          renderAll();
+        });
+      }
+    }
+
+    function syncHighlightUI(model) {
+      const activeId = state.lockedHighlightId || state.highlightedId;
+      const symbolEl = document.getElementById('inspectorSymbol');
+      const titleEl = document.getElementById('inspectorTitle');
+      const valEl = document.getElementById('inspectorValueBadge');
+      const unlockBtn = document.getElementById('btnClearHighlight');
+
+      if (state.lockedHighlightId) {
+        unlockBtn.classList.remove('hidden');
+      } else {
+        unlockBtn.classList.add('hidden');
+      }
+
+      const found = model.dimensions.find(d => d.id === activeId);
+      if (found) {
+        symbolEl.textContent = found.symbol;
+        titleEl.textContent = `${found.name} — ${found.desc}`;
+        valEl.textContent = `${formatLen(found.mm)} [${found.elec}]`;
+      } else {
+        symbolEl.textContent = 'ALL';
+        titleEl.textContent = 'Hover or click any dimension callout on the drawing or schedule below to isolate that part.';
+        valEl.textContent = '';
+      }
+
+      document.querySelectorAll('#measurementsTableBody tr').forEach(tr => {
+        const rowId = tr.getAttribute('data-dim-id');
+        if (rowId === activeId) {
+          tr.classList.add('dim-row-active');
+        } else {
+          tr.classList.remove('dim-row-active');
+        }
+      });
+
+      document.querySelectorAll('#antennaSvgCanvas .svg-dim-group').forEach(g => {
+        const gid = g.getAttribute('data-dim-id');
+        if (!activeId) {
+          g.style.opacity = '1.0';
+          g.classList.remove('svg-dim-highlight');
+        } else if (gid === activeId) {
+          g.style.opacity = '1.0';
+          g.classList.add('svg-dim-highlight');
+        } else {
+          g.style.opacity = '0.28';
+          g.classList.remove('svg-dim-highlight');
+        }
+      });
+    }
+
+    function renderMeasurementsTable(model) {
+      const tbody = document.getElementById('measurementsTableBody');
+      const activeId = state.lockedHighlightId || state.highlightedId;
+      document.getElementById('tableUnitHeader').textContent = state.unit;
+
+      tbody.innerHTML = model.dimensions.map(dim => {
+        const isHi = dim.id === activeId;
+        return `
+          <tr data-dim-id="${dim.id}" class="cursor-pointer hover:bg-[#18181F] transition ${isHi ? 'dim-row-active' : ''}">
+            <td class="py-2.5 px-3 whitespace-nowrap">
+              <span class="inline-block px-2 py-0.5 font-mono font-bold text-xs bg-[#09090B] border"
+                style="color:${dim.color}; border-color:${dim.color}">
+                ${dim.symbol}
+              </span>
+            </td>
+            <td class="py-2.5 px-3 font-medium text-white whitespace-nowrap">${dim.name}</td>
+            <td class="py-2.5 px-3 text-right font-mono font-bold text-sm text-[#FF5722] whitespace-nowrap">${formatLen(dim.mm)}</td>
+            <td class="py-2.5 px-3 text-right font-mono text-[#71717A] hidden sm:table-cell whitespace-nowrap">${dim.elec}</td>
+            <td class="py-2.5 px-3 text-[#A1A1AA] leading-relaxed">${dim.desc}</td>
+          </tr>
+        `;
+      }).join('');
+
+      tbody.querySelectorAll('tr').forEach(tr => {
+        const dimId = tr.getAttribute('data-dim-id');
+        tr.addEventListener('mouseenter', () => {
+          if (!state.lockedHighlightId) {
+            state.highlightedId = dimId;
+            syncHighlightUI(model);
+          }
+        });
+        tr.addEventListener('mouseleave', () => {
+          if (!state.lockedHighlightId) {
+            state.highlightedId = null;
+            syncHighlightUI(model);
+          }
+        });
+        tr.addEventListener('click', () => {
+          if (state.lockedHighlightId === dimId) {
+            state.lockedHighlightId = null;
+            state.highlightedId = null;
+          } else {
+            state.lockedHighlightId = dimId;
+            state.highlightedId = dimId;
+          }
+          syncHighlightUI(model);
+        });
+      });
+    }
+
+    function renderComparisonTray() {
+      const section = document.getElementById('comparisonSection');
+      const grid = document.getElementById('comparisonCardsGrid');
+      const countEl = document.getElementById('compareCount');
+      countEl.textContent = state.pinnedComparisons.length;
+
+      if (state.pinnedComparisons.length === 0) {
+        section.classList.add('hidden');
+        return;
+      }
+      section.classList.remove('hidden');
+
+      grid.innerHTML = state.pinnedComparisons.map((item, idx) => `
+        <div class="p-3 bg-[#09090B] border border-[#26262E] space-y-2 relative font-mono">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-white uppercase">${item.title}</span>
+            <button type="button" data-remove-idx="${idx}" class="remove-pin-btn text-xs text-[#71717A] hover:text-[#FF5722]">✕</button>
+          </div>
+          <div class="text-[11px] text-[#71717A]">f₀ = ${item.freqMHz.toFixed(2)} MHz // VF = ${item.vf}</div>
+          <div class="space-y-1 pt-1 border-t border-[#1E1E26] text-xs">
+            ${item.dims.slice(0, 3).map(d => `
+              <div class="flex justify-between">
+                <span class="text-[#A1A1AA]">${d.symbol}:</span>
+                <span class="text-[#FF5722] font-bold">${formatLen(d.mm)}</span>
+              </div>
+            `).join('')}
+          </div>
+          <div class="pt-1 flex justify-between text-[11px] text-[#00D2FF]">
+            <span>${item.gain}</span>
+            <span>${item.impedance}</span>
+          </div>
+        </div>
+      `).join('');
+
+      grid.querySelectorAll('.remove-pin-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = parseInt(btn.getAttribute('data-remove-idx'), 10);
+          state.pinnedComparisons.splice(idx, 1);
+          renderComparisonTray();
+        });
+      });
+    }
+
+    function renderAll() {
+      const model = computeAntennaModel();
+      const meta = ANTENNA_TYPES.find(t => t.id === state.antennaType) || ANTENNA_TYPES[0];
+
+      document.getElementById('activeTopologyBadge').textContent = meta.badge;
+      document.getElementById('bandClassificationBadge').textContent = getBandClassification(model.freqMHz);
+      document.getElementById('blueprintCodeTag').textContent = meta.code;
+      document.getElementById('blueprintTitle').textContent = `${meta.name} (${meta.shortSub}) — Mechanical Drawing`;
+
+      const periodNs = (1000 / model.freqMHz);
+      document.getElementById('periodReadout').textContent = periodNs >= 1
+        ? `T = ${periodNs.toFixed(2)} ns`
+        : `T = ${(periodNs * 1000).toFixed(1)} ps`;
+      document.getElementById('refLambdaFull').textContent = formatLen(model.lambdaMm);
+      document.getElementById('refLambdaHalf').textContent = formatLen(model.lambdaMm * 0.5);
+      document.getElementById('refLambdaQuarter').textContent = formatLen(model.lambdaMm * 0.25);
+      document.getElementById('refLambdaThreeQ').textContent = formatLen(model.lambdaMm * 0.75);
+
+      document.getElementById('formulaExplanationBox').innerHTML = model.formulasHtml;
+
+      document.getElementById('kpiGain').textContent = model.kpis.gain;
+      document.getElementById('kpiImpedance').textContent = model.kpis.impedance;
+      document.getElementById('kpiBeamwidth').textContent = model.kpis.beamwidth;
+      document.getElementById('kpiPolarization').textContent = model.kpis.polarization;
+
+      renderAntennaTypeBar();
+      renderBlueprintSvg(model);
+      renderPolarAndVswrCharts(model);
+      renderMeasurementsTable(model);
+      syncHighlightUI(model);
+      renderComparisonTray();
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toastNotification');
+      document.getElementById('toastMessage').textContent = msg;
+      toast.classList.remove('hidden');
+      toast.classList.add('flex');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => {
+        toast.classList.add('hidden');
+        toast.classList.remove('flex');
+      }, 2800);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderSpecificConstraintsControls();
+      renderAll();
+
+      document.querySelectorAll('.unit-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.unit = btn.getAttribute('data-unit');
+          document.querySelectorAll('.unit-btn').forEach(b => {
+            if (b.getAttribute('data-unit') === state.unit) {
+              b.className = 'unit-btn px-2.5 py-1 bg-[#FF5722] text-black font-bold transition';
+            } else {
+              b.className = 'unit-btn px-2.5 py-1 text-[#A1A1AA] hover:text-white transition';
+            }
+          });
+          renderAll();
+        });
+      });
+
+      const freqInput = document.getElementById('freqInput');
+      const freqSlider = document.getElementById('freqSlider');
+      const freqScaleSelect = document.getElementById('freqScaleSelect');
+
+      function updateFrequencyFromMHz(mhz) {
+        state.freqMHz = Math.max(0.5, Math.min(60000, mhz));
+        const displayVal = state.freqMHz / state.freqScale;
+        freqInput.value = Number(displayVal.toFixed(4));
+        freqSlider.value = Math.min(6000, Math.max(30, state.freqMHz));
+
+        document.querySelectorAll('.preset-chip').forEach(chip => {
+          const pFreq = parseFloat(chip.getAttribute('data-freq'));
+          if (Math.abs(pFreq - state.freqMHz) < 0.05) {
+            chip.className = 'preset-chip px-2 py-1 text-[11px] font-mono bg-[#FF5722]/15 text-[#FF5722] border border-[#FF5722] transition';
+          } else {
+            chip.className = 'preset-chip px-2 py-1 text-[11px] font-mono bg-[#16161B] hover:bg-[#1E1E26] text-[#A1A1AA] border border-[#282830] transition';
+          }
+        });
+        renderAll();
+      }
+
+      freqInput.addEventListener('input', () => {
+        const raw = parseFloat(freqInput.value);
+        if (!isNaN(raw) && raw > 0) {
+          state.freqMHz = raw * state.freqScale;
+          freqSlider.value = Math.min(6000, Math.max(30, state.freqMHz));
+          renderAll();
+        }
+      });
+
+      freqSlider.addEventListener('input', () => {
+        const mhz = parseFloat(freqSlider.value);
+        updateFrequencyFromMHz(mhz);
+      });
+
+      freqScaleSelect.addEventListener('change', () => {
+        state.freqScale = parseFloat(freqScaleSelect.value);
+        freqInput.value = Number((state.freqMHz / state.freqScale).toFixed(4));
+      });
+
+      document.querySelectorAll('.preset-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          const f = parseFloat(chip.getAttribute('data-freq'));
+          updateFrequencyFromMHz(f);
+        });
+      });
+
+      const vfInput = document.getElementById('vfInput');
+      const vfSlider = document.getElementById('vfSlider');
+      const materialSelect = document.getElementById('materialSelect');
+
+      vfInput.addEventListener('input', () => {
+        const v = parseFloat(vfInput.value);
+        if (!isNaN(v) && v >= 0.5 && v <= 1.0) {
+          state.vf = v;
+          vfSlider.value = v;
+          renderAll();
+        }
+      });
+      vfSlider.addEventListener('input', () => {
+        state.vf = parseFloat(vfSlider.value);
+        vfInput.value = state.vf.toFixed(3);
+        renderAll();
+      });
+      materialSelect.addEventListener('change', () => {
+        state.vf = parseFloat(materialSelect.value);
+        vfInput.value = state.vf.toFixed(2);
+        vfSlider.value = state.vf;
+        renderAll();
+      });
+
+      const wireDiaInput = document.getElementById('wireDiaInput');
+      const wireDiaSlider = document.getElementById('wireDiaSlider');
+      wireDiaInput.addEventListener('input', () => {
+        const d = parseFloat(wireDiaInput.value);
+        if (!isNaN(d) && d >= 0.1) {
+          state.wireDiaMm = d;
+          wireDiaSlider.value = Math.min(20, d);
+          renderAll();
+        }
+      });
+      wireDiaSlider.addEventListener('input', () => {
+        state.wireDiaMm = parseFloat(wireDiaSlider.value);
+        wireDiaInput.value = state.wireDiaMm.toFixed(1);
+        renderAll();
+      });
+
+      document.querySelectorAll('.view-mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.viewMode = btn.getAttribute('data-view');
+          const bpCont = document.getElementById('blueprintViewportContainer');
+          const radCont = document.getElementById('radiationViewportContainer');
+          document.querySelectorAll('.view-mode-btn').forEach(b => {
+            if (b.getAttribute('data-view') === state.viewMode) {
+              b.className = 'view-mode-btn px-2.5 py-1 bg-[#26262E] text-white font-semibold transition';
+            } else {
+              b.className = 'view-mode-btn px-2.5 py-1 text-[#71717A] hover:text-white transition';
+            }
+          });
+          if (state.viewMode === 'blueprint') {
+            bpCont.classList.remove('hidden');
+            radCont.classList.add('hidden');
+          } else {
+            bpCont.classList.add('hidden');
+            radCont.classList.remove('hidden');
+            renderPolarAndVswrCharts(computeAntennaModel());
+          }
+        });
+      });
+
+      const svgCanvas = document.getElementById('antennaSvgCanvas');
+      const zoomLabel = document.getElementById('zoomLabel');
+      function applyZoom() {
+        svgCanvas.style.transform = `scale(${state.zoom})`;
+        zoomLabel.textContent = `${Math.round(state.zoom * 100)}%`;
+      }
+      document.getElementById('btnZoomIn').addEventListener('click', () => {
+        state.zoom = Math.min(1.6, +(state.zoom + 0.15).toFixed(2));
+        applyZoom();
+      });
+      document.getElementById('btnZoomOut').addEventListener('click', () => {
+        state.zoom = Math.max(0.7, +(state.zoom - 0.15).toFixed(2));
+        applyZoom();
+      });
+      document.getElementById('btnZoomReset').addEventListener('click', () => {
+        state.zoom = 1.0;
+        applyZoom();
+      });
+
+      document.getElementById('btnClearHighlight').addEventListener('click', () => {
+        state.lockedHighlightId = null;
+        state.highlightedId = null;
+        renderAll();
+      });
+
+      document.getElementById('btnSaveSnapshot').addEventListener('click', () => {
+        const model = computeAntennaModel();
+        const meta = ANTENNA_TYPES.find(t => t.id === state.antennaType);
+        state.pinnedComparisons.push({
+          title: meta.name,
+          freqMHz: model.freqMHz,
+          vf: state.vf,
+          dims: model.dimensions,
+          gain: model.kpis.gain,
+          impedance: model.kpis.impedance
+        });
+        renderComparisonTray();
+        showToast(`PINNED ${meta.name.toUpperCase()} @ ${model.freqMHz.toFixed(2)} MHz`);
+      });
+
+      document.getElementById('btnClearCompare').addEventListener('click', () => {
+        state.pinnedComparisons = [];
+        renderComparisonTray();
+      });
+
+      document.getElementById('btnCopySpecs').addEventListener('click', () => {
+        const model = computeAntennaModel();
+        const meta = ANTENNA_TYPES.find(t => t.id === state.antennaType);
+        const lines = [
+          `# TARANGAM // KADIR-YANTRA RF CUT-SHEET — ${meta.name}`,
+          `Frequency: ${model.freqMHz.toFixed(3)} MHz | Free-Space λ: ${formatLen(model.lambdaMm)} | VF: ${state.vf}`,
+          `Directivity: ${model.kpis.gain} | Feed Impedance: ${model.kpis.impedance}`,
+          `------------------------------------------------------------`,
+          ...model.dimensions.map(d => `${d.symbol.padEnd(10)} | ${d.name.padEnd(32)} | ${formatLen(d.mm).padStart(12)} (${d.elec})`)
+        ].join('\n');
+
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(lines).then(() => showToast('COPIED RF CUT-SHEET TO CLIPBOARD'));
+          } else {
+            throw new Error('Fallback copy');
+          }
+        } catch (err) {
+          const ta = document.createElement('textarea');
+          ta.value = lines;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          showToast('COPIED RF CUT-SHEET TO CLIPBOARD');
+        }
+      });
+
+      document.getElementById('btnDownloadSvg').addEventListener('click', () => {
+        const svgEl = document.getElementById('antennaSvgCanvas');
+        const serializer = new XMLSerializer();
+        let source = serializer.serializeToString(svgEl);
+        if (!source.match(/^<svg[^>]+xmlns="http\:\/\/www\.w3\.org\/2000\/svg"/)) {
+          source = source.replace(/^<svg/, '<svg xmlns="http://www.w3.org/2000/svg"');
+        }
+        const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `tarangam_${state.antennaType}_${state.freqMHz.toFixed(0)}MHz_drawing.svg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('EXPORTED CAD DRAWING (.SVG)');
+      });
+    });
+  </script>
+</body>
+</html>
