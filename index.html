@@ -461,9 +461,7 @@
   </div>
 
   <script>
-    // =========================================================================
-    // TARANGAM // KADIR-YANTRA — Industrial RF Antenna Synthesis Engine
-    // =========================================================================
+
 
     const SPEED_OF_LIGHT = 299792458; // m/s in vacuum
 
@@ -1226,7 +1224,7 @@
           <rect x="0" y="0" width="234" height="42" fill="#0E0E12" stroke="#2C2C35" stroke-width="1" />
           <line x1="0" y1="21" x2="234" y2="21" stroke="#26262E" stroke-width="1" />
           <line x1="140" y1="0" x2="140" y2="42" stroke="#26262E" stroke-width="1" />
-          <text x="8" y="14" fill="#E4E4E7" font-family="JetBrains Mono, monospace" font-size="9.5" font-weight="700">TARANGAM // KADIR-YANTRA</text>
+          <text x="8" y="14" fill="#E4E4E7" font-family="JetBrains Mono, monospace" font-size="9.5" font-weight="700">TARANGAM</text>
           <text x="148" y="14" fill="#FF5722" font-family="JetBrains Mono, monospace" font-size="9.5" font-weight="700">UNIT: ${state.unit.toUpperCase()}</text>
           <text x="8" y="34" fill="#71717A" font-family="JetBrains Mono, monospace" font-size="9">TOPOLOGY: ${meta.id.toUpperCase()}</text>
           <text x="148" y="34" fill="#71717A" font-family="JetBrains Mono, monospace" font-size="9">TOL: ±0.1%</text>
@@ -2254,7 +2252,7 @@
         const model = computeAntennaModel();
         const meta = ANTENNA_TYPES.find(t => t.id === state.antennaType);
         const lines = [
-          `# TARANGAM // KADIR-YANTRA RF CUT-SHEET — ${meta.name}`,
+          `# TARANGAM — ${meta.name}`,
           `Frequency: ${model.freqMHz.toFixed(3)} MHz | Free-Space λ: ${formatLen(model.lambdaMm)} | VF: ${state.vf}`,
           `Directivity: ${model.kpis.gain} | Feed Impedance: ${model.kpis.impedance}`,
           `------------------------------------------------------------`,
